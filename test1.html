@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Document</title>
+</head>
+
+<body>
+<input type="text" id="xxx">
+<input type="text" id="ooo">
+<script src="laydate/laydate.js"></script>
+<script>
+var a = laydate.render({
+	elem: '#xxx',
+	// max:-10,
+	// min:-20,
+	max:10,
+	btns: ['clear','confirm'],
+	done: function(value, date, endDate) {
+		b.config.min = {
+			year: date.year,
+			month: date.month - 1,
+			date: date.date,
+			hours: date.hours,
+			minutes: date.minutes,
+			seconds: date.seconds
+		}
+	}
+});
+var b = laydate.render({
+	elem: '#ooo',
+	max:0,
+	done:function(value, date, endDate){
+		a.config.max = {
+			year: date.year,
+			month: date.month - 1,
+			date: date.date,
+			hours: date.hours,
+			minutes: date.minutes,
+			seconds: date.seconds
+		}
+	}
+});
+
+</script>
+</body>
+</html>
