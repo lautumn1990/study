@@ -1,7 +1,7 @@
 @echo off   
 
-call:programStart "chrome.exe" "C:\Users\Administrator.2017.V.2.12-007\Desktop\桌面快捷方式\gc.lnk"
 call:programStart "idea.exe" "C:\Users\Administrator.2017.V.2.12-007\Desktop\桌面快捷方式\id.lnk"
+call:programStart "chrome.exe" "C:\Users\Administrator.2017.V.2.12-007\Desktop\桌面快捷方式\gc.lnk"
 call:programStart "navicat.exe" "C:\Users\Administrator.2017.V.2.12-007\Desktop\桌面快捷方式\ms.lnk"
 call:programStart "Code.exe" "C:\Users\Administrator.2017.V.2.12-007\Desktop\桌面快捷方式\vs.lnk"
 :: 不关闭当前cmd
