@@ -24,6 +24,8 @@ Linux中的档名
 
 ## 常用命令
 
+uname -sr 系统核心版本
+
 date 当前日期 date
 cal 日历
 bc 计算器 默认整数 scale=3 保留三位有效数字 quit退出
@@ -44,3 +46,8 @@ chage -d 0 [username] 强制用户登陆一次之后改密码
 echo "password" | passwd --stdin [username] 用命令给用户改密码不用两次输入
 
 which [command] 命令在哪儿
+
+## 常见问题
+
+Determining IP information for eth0...failed 错误解决
+> VMware dhcp服务没有开
