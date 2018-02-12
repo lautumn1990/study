@@ -47,6 +47,12 @@ echo "password" | passwd --stdin [username] 用命令给用户改密码不用两
 
 which [command] 命令在哪儿
 
+## 变量
+
+LANG
+PATH
+~
+
 ## 常见问题
 
 Determining IP information for eth0...failed 错误解决
@@ -79,9 +85,9 @@ basic server 安装时默认没有开启eth0网卡
 切换文件用户和用户组
 chgrp [-R] GROUP FILE
 chown [-R] OWNER:GROUP FILE
-chmode [[u/g/o/a] [+/-/=] [rwx]] file 例子 chmod  u=rwx,go=rx  .bashrc 与chmod 755 .bashrc一样 chmod  a+w  .bashrc 增加可写权限
-
+chmode [[u/g/o/a] [+/-/=] [rwx]] file 例子 chmod  u=rwx,go=rx  .bashrc 与chmod 755 .bashrc一样 chmod  a+w  .bashrc 增加可写权限 chmod 4775 filename 其中4位的第一位表示SUID4/SGID2/SBIT1
 要开放目录给任何人浏览时，应该至少也要给予r及x的权限，但w权限不可随便给； 
+
 
 [root@www tmp]# 
 输入命令为#是root,输入命令$其他
@@ -187,8 +193,77 @@ lsattr 显示文件的隐藏属性
 SUID, SGID, SBIT
 SUID Set UID 运行期间取得拥有者权限
 SUID 仅可用在binary program 上， 不能够用在 shell script 上面！和目录上
-Sticky Bit
+SBIT Sticky Bit 尽可用于目录，创建者和root用户可对目录内文件有删除更名移动的权限
+SUID 4/ SGID 2/ SBIT 1   chmod 4775 filename
+大写ST表示没有此权限，因为拥有者用户没有此权限
 
+file filename 观察文件类型
+
+搜索
+which [-a] command 命令路径在PATH中找
+type command 文件类型
+whereis [-bmsu] 文件或目录名 -b binary类型-m manual路径下文件 -s source 来源文件 -u不在以上找
+find [PATH] [option] [action] 搜寻硬盘 
+时间相关find /tmm -mtime +4/-4/4 含义 +4 大于5天，-4小于四天，4 4-5天 -newer filename  比filename新的文件
+用户相关find /home -user lau 找出lau的文件 参数有-uid -gid -user -group  -nouser -nogroup
+文件权限与名称相关 -name -size -type [f,b,c,d,l,s,p] -perm mode/+mode/-mode
+额外功能 find / -perm +7000 -exec ls -l {} \; 执行额外的命令 -print 打印到萤幕上默认 -a 合并 -o 或者
+locate [-ir] keyword 查找-i 忽略大小写 -r 正则写法 从数据库中查找 updatedb 更新数据库
+
+## 硬盘与文件系统
+
+dumpe2fs 装置名称 列出文件系统信息 -h 仅superblock数据 -b 仅坏道
+du [-ahskm] 文件或目录名称 所有的文件数据容量  -S 减少目录汇总
+df [-ahikHTm] [目录或文件名] 目前挂载的装置 常用-h -a -i
+
+superblock：记录此 filesystem 的整体信息，包括inode/block的总量、使用量、剩余量， 以及文件系统的格式与相关信息等； 
+inode：记录文件的属性，一个文件占用一个inode，同时记录此文件的数据所在的 block 号码； CentOS5 128Bytes  CentOS6默认256Byte
+block：实际记录文件的内容，若文件太大时，会占用多个 block 。 1k 2k 4k 
+
+索引式文件系统(indexed allocation)。
+
+目录的inode存属性，block存文件名和对应的inode，ls -li 可查看文件名inode号码，目录至少占用一个block不够了再加
+文件的inode存属性，block存内容
+
+读取文件步骤
+/etc/passwd 读取步骤 先找/的inode 通过挂载点信息找，同时读权限; 然后找/的block找出etc/的inode号码;etc/的block找到passwd的inode;passwd的inode相关权限和block位置;passwd的block读取内容
+
+写入文件步骤
+先确定是否在新增目录有wx权限；根据inode bitmap查找空inode,写权限；根据block bitmap找空block,数据写入block，升级inode的block;将inode和block的数据同步到inode bitmap和block bitmap，并更新superblock
+
+不一致状态
+写入过程中断电等情况，使用e2fsck程序检查，同时ext3以后增加日志系统，避免全盘扫描
+
+挂载后才可使用
+linux通过VFS(Virtual Filesystem Switch)管理文件系统
+
+硬连接与软连接
+在inode级别连接是硬链接可以通过ls -li查看
+软连接是通过存路径的方式
+
+硬盘分区相关命令
+fdisk 装置名称 进行分区 其中m列出命令 p打印更改后的分割表 n增加分区 d删除 w写入 q不保存退出 fdisk无法处理2T以上的数据，可以使用parted命令
+mkfs [-t 文件系统格式] 装置文件名 磁盘格式化命令
+mke2fs [-b block大小] [-i block大小] [-L 标头] [-cj] 装置 详细配置格式化信息
+
+磁盘检验
+fsck [-t 文件系统] [-ACay] 装置名称 检查文件系统是否出错 filesystem check
+badblocks -[svw] 装置名称 检查坏道
+
+挂载
+mount -a 依照配置文件 /etc/fstab 的数据将所有未挂载的磁盘都挂载上来
+mount -l 显示Label 名称
+mount [-t 文件系统] [-L Label名] [-o 额外选项] [-n]  装置文件名  挂载点
+mount -o remount,rw,auto / 重新挂载根目录
+umount [-fn] 装置文件名或挂载点 卸载
+
+e2label 装置名称  新的Label名称 修改label名
+tune2fs [-jlL] 装置代号 修改设备信息 -l类似 dumpe2fs -h 的功能 -j带日志 -L修改label
+
+/etc/fstab 启动时的挂载信息 Device/Mount point/filesystem/parameters/dump/fsck
+/etc/mtab 实际挂载情况
+
+## 压缩
 
 
 ## maven仓库镜像
