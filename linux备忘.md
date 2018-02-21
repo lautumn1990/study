@@ -26,44 +26,44 @@ Linux中的档名
 
 uname -sr 系统核心版本
 
-date 当前日期 date
-cal 日历
-bc 计算器 默认整数 scale=3 保留三位有效数字 quit退出
-exit 退出 ctrl+d
+date 当前日期 date  
+cal 日历  
+bc 计算器 默认整数 scale=3 保留三位有效数字 quit退出  
+exit 退出 ctrl+d  
 man [command] 查找命令用法/ [command] --help 相似
 
-关机
-sync>shutdown or reboot 注意 shutdown 加时间只会结束服务，加上-h会在结束服务后立刻关机 shutdown会发提示关机命令给所有在线用户
+关机  
+sync>shutdown or reboot 注意 shutdown 加时间只会结束服务，加上-h会在结束服务后立刻关机 shutdown会发提示关机命令给所有在线用户  
 
-cat << EOF(定义结束符)
-first
-second
+cat << EOF(定义结束符)  
+first  
+second  
 EOF
 
-useradd [username] 增加用户
-passwd [username] 修改口令/不加口令则该自己
-chage -d 0 [username] 强制用户登陆一次之后改密码
-echo "password" | passwd --stdin [username] 用命令给用户改密码不用两次输入
+useradd [username] 增加用户  
+passwd [username] 修改口令/不加口令则该自己  
+chage -d 0 [username] 强制用户登陆一次之后改密码  
+echo "password" | passwd --stdin [username] 用命令给用户改密码不用两次输入  
 
-which [command] 命令在哪儿
+which [command] 命令在哪儿  
 
 ## 变量
 
-LANG
-PATH
+LANG  
+PATH  
 ~
 
 ## 常见问题
 
 Determining IP information for eth0...failed 错误解决
 > VMware dhcp服务没有开
-uname -r 内核版本
-lsb_release -a  LSB (Linux Standard Base) and Distribution information
+uname -r 内核版本  
+lsb_release -a  LSB (Linux Standard Base) and Distribution   information
 
 
 ## linux 安装
 
-basic server 安装时默认没有开启eth0网卡
+basic server 安装时默认没有开启eth0网卡  
 解决方法：将eth0中的onboot设置改为yes /etc/sysconfig/network-scripts/ifcfg-eth0中的设置更改 更改完成后 service network restart
 单次更改可以改为ifup eth0
 
@@ -82,11 +82,11 @@ basic server 安装时默认没有开启eth0网卡
 > rwx对文件来说是针对内容来讲，r可以读取内容，w可以改写内容，x是可执行文件  
 > rwx对文件夹来说，r可读取文件列表，w可增删文件，x可进入文件  
 
-切换文件用户和用户组
-chgrp [-R] GROUP FILE
-chown [-R] OWNER:GROUP FILE
-chmode [[u/g/o/a] [+/-/=] [rwx]] file 例子 chmod  u=rwx,go=rx  .bashrc 与chmod 755 .bashrc一样 chmod  a+w  .bashrc 增加可写权限 chmod 4775 filename 其中4位的第一位表示SUID4/SGID2/SBIT1
-要开放目录给任何人浏览时，应该至少也要给予r及x的权限，但w权限不可随便给； 
+切换文件用户和用户组  
+chgrp [-R] GROUP FILE  
+chown [-R] OWNER:GROUP FILE  
+chmode [[u/g/o/a] [+/-/=] [rwx]] file 例子 chmod  u=rwx,go=rx  .bashrc 与chmod 755 .bashrc一样 chmod  a+w  .bashrc 增加可写权限 chmod 4775 filename 其中4位的第一位表示SUID4/SGID2/SBIT1  
+要开放目录给任何人浏览时，应该至少也要给予r及x的权限，但w权限不可随便给；  
 
 
 [root@www tmp]# 
