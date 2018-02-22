@@ -265,6 +265,99 @@ tune2fs [-jlL] 装置代号 修改设备信息 -l类似 dumpe2fs -h 的功能 -j
 
 ## 压缩
 
+compress 非常老的压缩程序  默认档名*.Z  
+compress [-rcv] 文件或目录  <==这里是压缩  -r连同目录压缩  -c压缩输出到荧幕 -v显示变化  压缩时会删除源文件  compress -c man.config > man.config.back.Z 此种方式可保留源文件
+uncompress 文件.Z           <==这里是解压缩  
+
+gzip压缩  使用广泛  默认档名*.gz  
+gzip [-cdtv#] 档名  -c输出银幕，配合重定向  -d解压缩 -t检查一致性  -v输入过程  -#等级 -1最快压缩比差 -9最高  
+zcat 档名.gz  查看文件列表  zcat类似cat不过只能看文件列表  
+
+bzip2 压缩比高  默认档名*.bz2  
+bzip2 [-cdkzv#] 档名  -k保留源文件 -z压缩  bupzip2 等于 bzip2 -d 解压缩
+bzcat 档名.bz2  
+
+tar 打包命令 可以把一堆文件打包成一个  默认档名*.tar 压缩后*.tar.gz *.tar.bz2  
+tar [-j|-z] [cv] [-f 创建的档名] filename... <==打包与压缩  
+tar [-j|-z] [tv] [-f 创建的档名]             <==察看档名  
+tar [-j|-z] [xv] [-f 创建的档名] [-C 目录]   <==解压缩  
+tar 参数 -c创建打包文件create -t查看文件list -x解压缩解打包extract -j压缩bzip2 -z压缩gzip -v显示过程 -f filename 紧跟要处理的档名 -C directory紧跟目录 -p保留权限属性 -P保留绝对路径 默认相对路径 最好不要用-P --exclude=FILE 不打包文件
+例子
+> 压　缩：tar -jcv -f filename.tar.bz2 要被压缩的文件或目录名称  
+查　询：tar -jtv -f filename.tar.bz2  
+解压缩：tar -jxv -f filename.tar.bz2 -C 欲解压缩的目录  
+单一文件  tar -jxv -f 打包档.tar.bz2 待解开档名  
+tarfile  tar包未压缩  
+tarball  tar包压缩  
+
+dump完整备份  
+dump [-Suvj] [-level] [-f 备份档] 待备份数据 参数-S需要多少空间 -u记录到/etc/dumpupdates中 -v 显示过程 -j 加入bzip2支持 -level等级 -f 文件名  
+dump -W 列出/etc/fstab中的是否有备份  
+
+restore 还原备份  
+restore -t [-f dumpfile] [-h]        <==用来察看 dump 档
+restore -C [-f dumpfile] [-D 挂载点] <==比较dump与实际文件
+restore -i [-f dumpfile]             <==进入互动模式
+restore -r [-f dumpfile]             <==还原整个文件系统
+参数 -t 查看dump数据 -C比较 -i互动模式 -r还原 -h显示inode与label -f要处理的文件 -D挂载点与-C联用
+
+mkisofs：创建映像档  
+cdrecord：光盘烧录工具  
+
+dd 备份整颗 partition 或 整颗 disk  tar备份数据  
+dd if="input_file" of="output_file" bs="block_size" count="number"
+例子
+> 将 /etc/passwd 备份到 /tmp/passwd.back 当中  
+dd if=/etc/passwd of=/tmp/passwd.back  
+
+> 将自己的磁碟之第一个磁区备份下来  
+dd if=/dev/hdc of=/tmp/mbr.back bs=512 count=1  
+
+cpio 为相当优秀的备份命令
+
+## vim编辑器
+
+三种模式 一般模式，编辑模式，指令行模式（:/?）  
+一般模式：移动删除复制粘贴  
+编辑模式：输入替换文字  
+指令行模式：读取存储搜索等  
+一般模式-->编辑模式i/o/a/R 返回esc  
+一般模式-->指令行模式:/? 返回esc  
+编辑模式与指令行模式不可切换  
+
+指令图片  
+![指令1](image/vim-commands.jpg)
+![指令2](image/vi-vim-cheat-sheet-sch.gif)
+
+特殊  
+区块选择 v字符选择 V行选择 ctrl+v区块选择 y复制 d删除  
+多档案 :n 下一个档案 :N上一个档案 :files所有的档案  
+多窗口 :sp 分成两个 :sp filename 分两个 ctrl+w +j/↓ 下一个窗口 ctrl+w +k/↑上一个窗口 ctrl+w +q离开  
+vim环境设定与记录 ~/.vimrc  ~/.viminfo  
+例子
+> vim ~/.vimrc  
+"这个档案的双引号 (") 是批注  
+set hlsearch            "高亮度反白  
+set backspace=2         "可随时用退格键删除  
+set autoindent          "自动缩排  
+set ruler               "可显示最后一行的状态  
+set showmode            "左下角那一行的状态  
+set nu                  "可以在每一行的最前面显示行号啦！  
+set bg=dark             "显示不同的底色色调  
+syntax on               "进行语法检验，颜色显示。  
+
+换行符  
+linux/unix \n LF  $  
+windows \r\n CRLF  ^M$  
+Carriage-Return Line-Feed \r=return \n=newline  
+
+dos2unix [-kn] file [newfile]  -k保留mtime -n 保留旧文档 dos2unix -n old new  
+unix2dos [-kn] file [newfile]  
+iconv  --list  
+iconv -f 原本编码 -t 新编码 filename [-o newfile]  
+
+## shell脚本
+
 
 ## maven仓库镜像
 
