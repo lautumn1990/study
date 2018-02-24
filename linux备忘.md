@@ -160,7 +160,7 @@ rmdir 删除空目录 -p上一级空目录也删
 为了安全不建议将.即当前目录加入PATH  
 
 文件管理  
-ls [-aAdfFhilnrRSt] 目录名称 文件与目录检视   
+ls [-aAdfFhilnrRSt] 目录名称 文件与目录检视  
 cp [-adfilprsu] 来源档(source) 目标档(destination) 复制 cp -l 硬连接 -s 软连接 i-node  
 rm [-fir] 文件或目录 删除目录  
 mv [-fiu] source destination  
@@ -168,7 +168,7 @@ basename /a/b/c/123 返回123
 dirname /a/b/c/123 返回/a/b/c  
 
 文件内容查阅  
-cat  由第一行开始显示文件内容  cat -n 行号  
+cat  由第一行开始显示文件内容  cat -n 行号  -b 不显示空白行  
 tac  从最后一行开始显示，可以看出 tac 是 cat 的倒著写！  
 nl   显示的时候，顺道输出行号！ 更多行号设置更能  
 more 一页一页的显示文件内容  
@@ -539,7 +539,93 @@ find /sbin -perm +7000 | xargs ls -l
 
 ## 正则表达式
 
-通配符和正则表达式不同 bash中是通配符  
+通配符和正则表达式不同 bash中是通配符 区别 如*在bash中表示任意多字符，正则中表示前一字符任意次  
+支持正则的工具有vi grep awk sed等  
+cp ls中仅支持通配符而已
+
+grep过滤字符串 以行为单位  
+grep [-A] [-B] [--color=auto] '搜寻字串' filename 参数-n显示行数当前行: 前后行- -A后几行-B前几行  --color颜色  -v排除  -i忽略大小写  
+dmesg | grep -n --color=auto 'eth'  
+正则 [list]表集合 [a-z]表范围 [^z]排除z  ^the the在行首 the$ the在行尾 `\.`转义字符. ^$表示空白行 .表示任意字符 *重复任意次 `\{1,10\}`重复次数需加转义  
+
+sed 比grep增加替换功能 stream editor  
+sed [-nefr] [动作] 参数 -n静默模式 -e编辑模式(单一动作默认) -f写入文件 -r延伸正则 -i直接改内容 n1,n2 function 在n1到n2内操作 function有 a新增 c取代 d删除 i插入 p打印 s取代 如：1,20s/old/new/g  
+
+```shell
+> nl /etc/passwd | sed '2,5d' #删除2,5行  
+nl /etc/passwd | sed '2a drink tea'  #第二行之后添加  
+nl /etc/passwd | sed '2i drink tea'  #第二行之前添加  
+nl /etc/passwd | sed '2,5c No 2-5 number'  #2-5行替换为No 2-5 number
+nl /etc/passwd | sed -n '5,7p' #仅列出5-7行
+ifconfig eth0 | grep 'inet addr' | sed 's/^.*addr://g' | sed 's/Bcast.*$//g' #替换为空，即删除
+cat /etc/man.config | grep 'MAN'| sed 's/#.*$//g' | sed '/^$/d' #删除空格与注释
+cat /etc/man.config | grep 'MAN'| sed -e 's/#.*$//g' -e '/^$/d' #删除空格与注释
+sed -i 's/\.$/\!/g' regular_express.txt #直接修改文件
+sed -i '$a # This is a test' regular_express.txt #在最后一行加入内容
+```
+
+egrep 或 grep -E
+延伸正则 +一个以上 ?零个或一个 |两个取一个 ()分组 ()+分组至少一个  
+
+文件格式化与数据处理  
+printf 格式化打印  
+printf '列印格式' 实际内容 转义字符 \a警告声 \b删除键 \f清除 \n换行 \r回车 \t制表符 \v垂直制表符 \xNN字节转换 如\x41是A %ns字符串 %ni数字 %n.mf小数 其中n是位数大于0右对齐 小于0左对齐 m为小数点位数
+
+awk 数据处理工具
+awk '条件类型1{动作1} 条件类型2{动作2} ...' filename  
+NF 总列数 NR第几行 FS分隔符 OFS输出分隔符  
+awk 逻辑运算符 > < >= <= == !=  
+
+```shell
+last -n 5 | awk '{print $1 "\t" $3}' #以空格分 打印1和3列
+last -n 5| awk '{print $1 "\t lines: " NR "\t columns: " NF}' #查看当前行数与当前行列数
+cat /etc/passwd | awk '{FS=":"} $3 < 10 {print $1 "\t " $3}' #第一行不变
+cat /etc/passwd | awk 'BEGIN {FS=":"} $3 < 10 {print $1 "\t " $3}' #先执行BEGIN
+
+cat pay.txt
+Name    1st     2nd     3th
+VBird   23000   24000   25000
+DMTsai  21000   20000   23000
+Bird2   43000   42000   41000
+
+cat pay.txt | awk 'NR==1{printf "%10s %10s %10s %10s %10s\n",$1,$2,$3,$4,"Total" }
+NR>=2{total = $2 + $3 + $4
+printf "%10s %10d %10d %10d %10.2f\n", $1, $2, $3, $4, total}' #第一行添加Total，其余行计算
+
+cat pay.txt | awk '{if(NR==1) printf "%10s %10s %10s %10s %10s\n",$1,$2,$3,$4,"Total"}
+NR>=2{total = $2 + $3 + $4
+printf "%10s %10d %10d %10d %10.2f\n", $1, $2, $3, $4, total}' #功能相同判断在动作内
+
+```
+
+diff比较文件差异，同一文件新旧版本  
+diff [-bBi] from-file to-file 参数 -b忽略空白差异 -B忽略空白行差异 -i忽略大小写  也可比较目录 diff /etc/rc3.d/ /etc/rc5.d/  
+
+cmp file1 file2 可比较二进制文件 以位组为单位 diff以行为单位  
+
+patch 升级还原文件
+patch -pN < patch_file    <==升级 -p为取消几层目录
+patch -R -pN < patch_file <==还原 -R为还原
+
+```shell
+diff -Naur passwd.old passwd.new > passwd.patch #制作patch文件
+patch -p0 < passwd.patch #升级
+patch -R -p0 < passwd.patch #还原
+```
+
+pr加标题与页面 如 pr /etc/man.config  
+
+## shell 脚本
+
+shell script 用在系统管理上面是很好的一项工具，但是用在处理大量数值运算上， 就不够好了，因为 Shell scripts 的速度较慢，且使用的 CPU 资源较多，造成主机资源的分配不良  
+
+下达命令方式 直接下达（绝对、相对、PATH） bash程序运行 `sh shell.sh` 或 `bash shell.sh`  
+
+```shell
+# 打印ascii码表  
+alias ascii="awk 'BEGIN{H=19;for(n=0;n<H;n++){for(m=0;m<=4;m++){if(n==0){h=h\"\x1b[1;31mC \x1b[37m:\x1b[36mOct\x1b[37m:\x1b[35mHex\x1b[37m:\x1b[33mDec\x1b[m  \";l=l\"================\"}c=32+n+m*H;p=p sprintf(\"\x1b[1;31m%c \x1b[37m:\x1b[36m%03o\x1b[37m:\x1b[35m%2Xh\x1b[37m:\x1b[33m%-3d\x1b[m  \",c,c,c,c)}if(n==0)print h\"\n\"l;print p;p=\"\"}}'"  
+```
+
 
 ## maven仓库镜像
 
