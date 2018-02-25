@@ -1,5 +1,77 @@
 # linux 学习
 
+- [linux 学习](#linux-%E5%AD%A6%E4%B9%A0)
+    - [经典语句](#%E7%BB%8F%E5%85%B8%E8%AF%AD%E5%8F%A5)
+    - [硬盘](#%E7%A1%AC%E7%9B%98)
+        - [Linux中的档名](#linux%E4%B8%AD%E7%9A%84%E6%A1%A3%E5%90%8D)
+    - [常用命令](#%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4)
+    - [常见问题](#%E5%B8%B8%E8%A7%81%E9%97%AE%E9%A2%98)
+        - [Determining IP information for eth0...failed 错误解决](#determining-ip-information-for-eth0failed-%E9%94%99%E8%AF%AF%E8%A7%A3%E5%86%B3)
+    - [linux 安装](#linux-%E5%AE%89%E8%A3%85)
+    - [linux 文件](#linux-%E6%96%87%E4%BB%B6)
+        - [文件权限 -rwxr-xr-x](#%E6%96%87%E4%BB%B6%E6%9D%83%E9%99%90--rwxr-xr-x)
+        - [切换文件用户和用户组](#%E5%88%87%E6%8D%A2%E6%96%87%E4%BB%B6%E7%94%A8%E6%88%B7%E5%92%8C%E7%94%A8%E6%88%B7%E7%BB%84)
+        - [`[root@www tmp]#`](#rootwww-tmp)
+        - [Filesystem Hierarchy Standard (FHS)标准](#filesystem-hierarchy-standard-fhs%E6%A0%87%E5%87%86)
+    - [目录](#%E7%9B%AE%E5%BD%95)
+        - [文件管理](#%E6%96%87%E4%BB%B6%E7%AE%A1%E7%90%86)
+        - [文件内容查阅](#%E6%96%87%E4%BB%B6%E5%86%85%E5%AE%B9%E6%9F%A5%E9%98%85)
+        - [隐藏属性](#%E9%9A%90%E8%97%8F%E5%B1%9E%E6%80%A7)
+        - [特殊权限](#%E7%89%B9%E6%AE%8A%E6%9D%83%E9%99%90)
+        - [搜索](#%E6%90%9C%E7%B4%A2)
+    - [硬盘与文件系统](#%E7%A1%AC%E7%9B%98%E4%B8%8E%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F)
+        - [硬连接与软连接](#%E7%A1%AC%E8%BF%9E%E6%8E%A5%E4%B8%8E%E8%BD%AF%E8%BF%9E%E6%8E%A5)
+        - [硬盘分区相关命令](#%E7%A1%AC%E7%9B%98%E5%88%86%E5%8C%BA%E7%9B%B8%E5%85%B3%E5%91%BD%E4%BB%A4)
+        - [磁盘检验](#%E7%A3%81%E7%9B%98%E6%A3%80%E9%AA%8C)
+        - [挂载](#%E6%8C%82%E8%BD%BD)
+    - [压缩](#%E5%8E%8B%E7%BC%A9)
+        - [dump完整备份](#dump%E5%AE%8C%E6%95%B4%E5%A4%87%E4%BB%BD)
+        - [restore 还原备份](#restore-%E8%BF%98%E5%8E%9F%E5%A4%87%E4%BB%BD)
+    - [vim编辑器](#vim%E7%BC%96%E8%BE%91%E5%99%A8)
+        - [指令图片](#%E6%8C%87%E4%BB%A4%E5%9B%BE%E7%89%87)
+        - [特殊](#%E7%89%B9%E6%AE%8A)
+    - [shell脚本](#shell%E8%84%9A%E6%9C%AC)
+        - [bash优点](#bash%E4%BC%98%E7%82%B9)
+        - [内建命令](#%E5%86%85%E5%BB%BA%E5%91%BD%E4%BB%A4)
+        - [变量](#%E5%8F%98%E9%87%8F)
+        - [变量内容修改](#%E5%8F%98%E9%87%8F%E5%86%85%E5%AE%B9%E4%BF%AE%E6%94%B9)
+        - [判断是否当前有值,然后赋值](#%E5%88%A4%E6%96%AD%E6%98%AF%E5%90%A6%E5%BD%93%E5%89%8D%E6%9C%89%E5%80%BC%E7%84%B6%E5%90%8E%E8%B5%8B%E5%80%BC)
+        - [别名](#%E5%88%AB%E5%90%8D)
+        - [历史命令 history](#%E5%8E%86%E5%8F%B2%E5%91%BD%E4%BB%A4-history)
+        - [命令搜索顺序](#%E5%91%BD%E4%BB%A4%E6%90%9C%E7%B4%A2%E9%A1%BA%E5%BA%8F)
+        - [进站信息](#%E8%BF%9B%E7%AB%99%E4%BF%A1%E6%81%AF)
+        - [环境配置文件](#%E7%8E%AF%E5%A2%83%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6)
+        - [其他配置文件](#%E5%85%B6%E4%BB%96%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6)
+        - [shell常用快捷键](#shell%E5%B8%B8%E7%94%A8%E5%BF%AB%E6%8D%B7%E9%94%AE)
+        - [通配符](#%E9%80%9A%E9%85%8D%E7%AC%A6)
+    - [正则表达式](#%E6%AD%A3%E5%88%99%E8%A1%A8%E8%BE%BE%E5%BC%8F)
+        - [grep过滤字符串 以行为单位](#grep%E8%BF%87%E6%BB%A4%E5%AD%97%E7%AC%A6%E4%B8%B2-%E4%BB%A5%E8%A1%8C%E4%B8%BA%E5%8D%95%E4%BD%8D)
+        - [sed 比grep增加替换功能 stream editor](#sed-%E6%AF%94grep%E5%A2%9E%E5%8A%A0%E6%9B%BF%E6%8D%A2%E5%8A%9F%E8%83%BD-stream-editor)
+        - [egrep 或 grep -E](#egrep-%E6%88%96-grep--e)
+        - [文件格式化与数据处理](#%E6%96%87%E4%BB%B6%E6%A0%BC%E5%BC%8F%E5%8C%96%E4%B8%8E%E6%95%B0%E6%8D%AE%E5%A4%84%E7%90%86)
+    - [shell 脚本](#shell-%E8%84%9A%E6%9C%AC)
+        - [Hello World程序](#hello-world%E7%A8%8B%E5%BA%8F)
+        - [务必加注释](#%E5%8A%A1%E5%BF%85%E5%8A%A0%E6%B3%A8%E9%87%8A)
+        - [对谈式脚本](#%E5%AF%B9%E8%B0%88%E5%BC%8F%E8%84%9A%E6%9C%AC)
+        - [数值加减](#%E6%95%B0%E5%80%BC%E5%8A%A0%E5%87%8F)
+        - [运行方式差异](#%E8%BF%90%E8%A1%8C%E6%96%B9%E5%BC%8F%E5%B7%AE%E5%BC%82)
+        - [test 条件判断](#test-%E6%9D%A1%E4%BB%B6%E5%88%A4%E6%96%AD)
+        - [判断符号[] 常常用在if判断中](#%E5%88%A4%E6%96%AD%E7%AC%A6%E5%8F%B7-%E5%B8%B8%E5%B8%B8%E7%94%A8%E5%9C%A8if%E5%88%A4%E6%96%AD%E4%B8%AD)
+        - [if语句](#if%E8%AF%AD%E5%8F%A5)
+        - [case语句](#case%E8%AF%AD%E5%8F%A5)
+        - [function函数](#function%E5%87%BD%E6%95%B0)
+        - [while循环 条件不成立终止 unitl条件成立终止](#while%E5%BE%AA%E7%8E%AF-%E6%9D%A1%E4%BB%B6%E4%B8%8D%E6%88%90%E7%AB%8B%E7%BB%88%E6%AD%A2-unitl%E6%9D%A1%E4%BB%B6%E6%88%90%E7%AB%8B%E7%BB%88%E6%AD%A2)
+        - [for循环](#for%E5%BE%AA%E7%8E%AF)
+        - [bug调试](#bug%E8%B0%83%E8%AF%95)
+    - [maven仓库镜像](#maven%E4%BB%93%E5%BA%93%E9%95%9C%E5%83%8F)
+    - [常用缩写](#%E5%B8%B8%E7%94%A8%E7%BC%A9%E5%86%99)
+        - [1. 目录缩写](#1-%E7%9B%AE%E5%BD%95%E7%BC%A9%E5%86%99)
+        - [2. 命令缩写](#2-%E5%91%BD%E4%BB%A4%E7%BC%A9%E5%86%99)
+        - [3. 编程相关缩写](#3-%E7%BC%96%E7%A8%8B%E7%9B%B8%E5%85%B3%E7%BC%A9%E5%86%99)
+        - [4. 递归缩写](#4-%E9%80%92%E5%BD%92%E7%BC%A9%E5%86%99)
+        - [5. 其他缩写](#5-%E5%85%B6%E4%BB%96%E7%BC%A9%E5%86%99)
+        - [6. 参考资料](#6-%E5%8F%82%E8%80%83%E8%B5%84%E6%96%99)
+
 ## 经典语句
 
 > 在Windows里面,设定不好设备,您可以骂它;在Linux里面,如果设定好设备了,您得要感激它!  
@@ -23,44 +95,45 @@
 
 ## 常用命令
 
-uname -sr 系统核心版本
+`uname -sr` 系统核心版本
 
-date 当前日期 date  
-cal 日历  
-bc 计算器 默认整数 scale=3 保留三位有效数字 quit退出  
-exit 退出 ctrl+d  
-man [command] 查找命令用法/ [command] --help 相似
+`date` 当前日期 date  
+`cal` 日历  
+`bc` 计算器 默认整数 scale=3 保留三位有效数字 quit退出  
+`exit` 退出 ctrl+d  
+`man [command]` 查找命令用法/ [command] --help 相似
 
 **关机**  
-sync>shutdown or reboot 注意 shutdown 加时间只会结束服务,加上-h会在结束服务后立刻关机 shutdown会发提示关机命令给所有在线用户  
+`sync`>`shutdown` or `reboot` 注意 shutdown 加时间只会结束服务,加上-h会在结束服务后立刻关机 shutdown会发提示关机命令给所有在线用户  
 
-cat << EOF(定义结束符)  
+`cat` << EOF(定义结束符)  
 first  
 second  
 EOF
 
-useradd [username] 增加用户  
-passwd [username] 修改口令/不加口令则该自己  
-chage -d 0 [username] 强制用户登陆一次之后改密码  
-echo "password" | passwd --stdin [username] 用命令给用户改密码不用两次输入  
+`useradd [username]` 增加用户  
+`passwd [username]` 修改口令/不加口令则该自己  
+`chage -d 0 [username]` 强制用户登陆一次之后改密码  
+`echo "password" | passwd --stdin [username]` 用命令给用户改密码不用两次输入  
 
-which [command] 命令在哪儿  
+`which [command]` 命令在哪儿  
 
 ## 常见问题
 
 ### Determining IP information for eth0...failed 错误解决
 
-> VMware dhcp服务没有开  
-uname -r 内核版本  
-lsb_release -a  LSB (Linux Standard Base) and Distribution   information
+VMware dhcp服务没有开  
+
+`uname -r` 内核版本  
+`lsb_release -a`  LSB (Linux Standard Base) and Distribution   information
 
 ## linux 安装
 
-### basic server 安装时默认没有开启eth0网卡  
+**basic server 安装时默认没有开启eth0网卡**  
+将eth0中的onboot设置改为yes `/etc/sysconfig/network-scripts/ifcfg-eth0`中的设置更改 更改完成后 `service network restart`  
+单次更改可以改为`ifup eth0`  
 
-> 将eth0中的onboot设置改为yes /etc/sysconfig/network-scripts/ifcfg-eth0中的设置更改 更改完成后 service network restart  
-单次更改可以改为ifup eth0  
-centos7中取消ifconfig命令 可安装net-tools 或者使用ip addr  
+centos7中取消`ifconfig`命令 可安装`net-tools` 或者使用`ip addr`  
 
 ## linux 文件
 
@@ -79,9 +152,9 @@ centos7中取消ifconfig命令 可安装net-tools 或者使用ip addr
 
 ### 切换文件用户和用户组  
 
-chgrp [-R] GROUP FILE  
-chown [-R] OWNER:GROUP FILE  
-chmode [[u/g/o/a] [+/-/=] [rwx]] file 例子 chmod  u=rwx,go=rx  .bashrc 与chmod 755 .bashrc一样 chmod  a+w  .bashrc 增加可写权限 chmod 4775 filename 其中4位的第一位表示SUID4/SGID2/SBIT1  
+`chgrp [-R] GROUP FILE`  
+`chown [-R] OWNER:GROUP FILE`  
+`chmode [[u/g/o/a] [+/-/=] [rwx]] file` 例子 chmod  u=rwx,go=rx  .bashrc 与chmod 755 .bashrc一样 chmod  a+w  .bashrc 增加可写权限 chmod 4775 filename 其中4位的第一位表示SUID4/SGID2/SBIT1  
 要开放目录给任何人浏览时,应该至少也要给予r及x的权限,但w权限不可随便给;  
 
 ### `[root@www tmp]#`  
@@ -124,7 +197,7 @@ FHS针对目录树架构仅定义出三层目录底下应该放置什么数据�
 
 不可与根目录分开`/etc` `/bin` `/dev` `/lib` `/sbin`  
 
-**`/usr`**目录下(unix software resource)Unix操作系统软件资源 类似于'C:\Windows\ + C:\Program files\'  
+**`/usr`** 目录下(unix software resource)Unix操作系统软件资源 类似于'C:\Windows\ + C:\Program files\'  
 `/usr/X11R6` x window system重要数据11版第6次  
 `/usr/bin/` 绝大部分用户指令  
 `/usr/include` c/c++等语言的include文件  
@@ -182,7 +255,7 @@ modification time (mtime):内容更改时间
 status time (ctime):状态(属性权限)更改时间  
 access time (atime):内容获取时间  
 
-`umask` 文件默认权限 文档默认666 文件夹默认777 减去umask值为默认权限 umask 002 修改默认权限  
+`umask` 文件默认权限 文档默认666 文件夹默认777 减去umask值为默认权限 umask 002 修改默认权限  在/etc/bashrc中设置默认值  
 
 ### 隐藏属性  
 
@@ -496,6 +569,8 @@ source 配置文件名 source ~/.bashrc  .  ~/.bashrc命令相同
 `ctrl+z` 暂停目前命令  
 `ctrl+c` 中止命令
 `ctrl+d` 输入结束符  
+
+快速删除密码 `ctrl+u` 或者 `esc+backspace`  
 
 ### 通配符  
 
@@ -990,3 +1065,135 @@ alias ascii="awk 'BEGIN{H=19;for(n=0;n<H;n++){for(m=0;m<=4;m++){if(n==0){h=h\"\x
 ```shell
 lftp http://maven.aliyun.com/nexus/content/repositories/central/ -e 'mirror .'
 ```
+
+## 常用缩写
+
+### 1. 目录缩写
+
+缩写 | 全称 | 说明
+--- | --- | --- |
+/bin | BINaries | 二进制可执行命令
+/dev | DEVices | 特殊设备文件
+/etc | ETCetera | 系统管理和配置文件
+/etc/fstab | FileSystem TABle | 文件/etc/fstab包含了静态文件系统信息，定义了存储设备和分区整合到整个系统的方式。mount 命令会读取这个文件，确定设备和分区的挂载选项。
+/lib | LIBraries | 库文件
+/mnt | MouNT | 系统提供这个目录是让用户临时挂载其他的文件系统。
+/opt | OPTion | 第三方软件放置的目录。如果你想自行安装额外的软件(非原本的 distribution 提供的)，那么也能够将你的软件安装到这里来。
+/proc | PROCesses | 虚拟的目录，是系统内存的映射。可直接访问这个目录来获取系统信息。
+/sbin | Super BINaries, Superuser BINaries | 系统管理命令，这里存放的是系统管理员使用的管理程序
+/srv | SeRVices | 是一些网络服务启动后，这些服务所需要取用的数据目录。常见的服务例如 WWW，FTP 等。
+/sys | SYStem | 虚拟文件系统，主要记录与内核相关的信息，包括目前已加载的内核模块与内核检测到的硬件设备信息，同样不占硬盘容量。
+/tmp | TeMPorary | 公用的临时文件存储点
+tty | teletypewriter | “电传打字机”，在类Unix里，键盘显示器，都是虚拟的teletypewriter
+/usr | Unix System/Software/Shared Resources | “Unix 操作系统软件资源” 所放置的目录，不是用户数据。 FHS 建议所有的软件开发者应该将他们的数据合理的放置到这个目录下的子目录，而不是自行新建该软件自己独立的目录。
+/var | VARiable | 某些大文件的溢出区，比方说各种服务的日志文件
+
+注：具体到各个目录的功能以及作用，可以参考下面两篇文章：
+
+- [Linux中常用的命令都是哪些单词的缩写？](https://www.zhihu.com/question/49073893)
+- [(转)linux 目录结构及其含义](http://www.cnblogs.com/zhyryxz/archive/2012/05/03/2480242.html)(这篇比较详细)
+
+### 2. 命令缩写
+
+缩写 | 全称 | 说明
+--- | --- | ---
+apt | Advanced Packaging Tool | 是Debian Linux发行版中的APT软件包管理工具。一般配合apt-get或者apt-update
+awk | Aho Weiberger and Kernighan | Alfred Aho，Peter Weinberger, 和 Brian Kernighan 的Family Name的首字符。一种编程语言，用于在linux/unix下对文本和数据进行处理。
+bash | Bourne Again SHell | 一种shell
+bg | BackGround | 用于将作业放到后台运行，使前台可以执行其他任务。该命令的运行效果与在指令后面添加符号&的效果是相同的，都是将其放到系统后台执行。
+cal | CALendar | 用于显示当前日历，或者指定日期的日历。
+cat | CATenate | "连接"，连接文件并打印到标准输出设备上，cat经常用来显示文件的内容，类似于下的type命令。
+chgrp | CHange GRouP | 用来改变文件或目录所属的用户组。
+chmod | CHange MODe | 用来变更文件或目录的权限。
+chown | CHange OWNer | 改变某个文件或目录的所有者和所属的组，该命令可以向某个用户授权，使该用户变成指定文件的所有者或者改变文件所属的组。
+cd | Change Directory | 切换工作目录
+cp | CoPy | 将一个或多个源文件或者目录复制到指定的目的文件或目录
+dd | Data Description | 用于复制文件并对原文件的内容进行转换和格式化处理。
+df | Disk Free | 用于显示磁盘分区上的可使用的磁盘空间。默认显示单位为KB。
+du | Disk Usage | 查看使用空间的，但是与df命令不同的是Linux du命令是对文件和目录磁盘使用的空间的查看，还是和df命令有一些区别的。
+diff | DIFFerence | 在最简单的情况下，比较给定的两个文件的不同。
+dpkg | Debian PacKaGe | Debian Linux系统用来安装、创建和管理软件包的实用工具。
+ed | EDitor | 单行纯文本编辑器，它有命令模式（command mode）和输入模式（input mode）两种工作模式。
+emacs |  Editor MACroS | 是由GNU组织的创始人Richard Stallman开发的一个功能强大的全屏文本编辑器，它支持多种编程语言，具有很多优良的特性。(备注：vim大法好！！！)
+env | ENVironment | 用于显示系统中已存在的环境变量，以及在定义的环境中执行指令。
+exec | EXECute | 用于调用并执行指令的命令。
+fsck | File System Consistency checK, or fuck | 用于检查并且试图修复文件系统中的错误。
+gawk | Gnu Aho Weiberger and Kernighan |
+grep | Gnu Regular Expression Print | （global search regular expression(RE) and print out the line，全面搜索正则表达式并把行打印出来）是一种强大的文本搜索工具，它能使用正则表达式搜索文本，并把匹配的行打印出来。
+grub | GRand Unified Bootloader | 多重引导程序grub的命令行shell工具。
+ifconfig | InterFace CONFIGuration | 被用于配置和显示Linux内核中网络接口的网络参数。
+init | INITialization | Linux下的进程初始化工具
+insmod | INStall Module | 用于将给定的模块加载到内核中。
+ln | LiNk | 用来为文件创件连接，连接类型分为硬连接和符号连接两种，默认的连接类型是硬连接。如果要创建符号连接必须使用"-s"选项。
+ls | LiSt | 显示目标列表
+lsmod | LiSt Module | 用于显示已经加载到内核中的模块的状态信息。
+man | MANual | Linux下的帮助指令，通过man指令可以查看Linux中的指令帮助、配置文件帮助和编程帮助等信息。一般戏称有问题找男人。。。
+mkdir | MaKe DIRectory | 创建目录
+mkfs | MaKe FileSystem | 用于在设备上（通常为硬盘）创建Linux文件系统。
+mv | MoVe | 对文件或目录重新命名，或者将文件从一个目录移到另一个目录中。
+nano | Nano's ANOther editor | 是一个字符终端的文本编辑器，有点像DOS下的editor程序。
+parted | PARTition EDitor | 是由GNU组织开发的一款功能强大的磁盘分区和分区大小调整工具，与fdisk不同，它支持调整分区的大小。
+passwd | PASSWorD | 用于设置用户的认证信息，包括用户密码、密码过期时间等。
+ping | Packet InterNet Grouper | 用来测试主机之间网络的连通性。执行ping指令会使用ICMP传输协议，发出要求回应的信息，若远端主机的网络功能没有问题，就会回应该信息，因而得知该主机运作正常。
+popd | POP from Directory | 删除目录栈中的记录；
+pushd | PUSH to Directory | 是将目录加入命令堆叠中。
+ps | Processes Status | 报告当前系统的进程状态。可以搭配kill指令随时中断、删除不必要的程序。
+pwd | Print Working Directory | 以绝对路径的方式显示用户当前工作目录
+rcconf | Run Command CONFiguration | Debian Linux下的运行等级服务配置工具，用以设置在特定的运行等级下系统服务的启动配置。
+rm | ReMove | 可以删除一个目录中的一个或多个文件或目录，也可以将某个目录及其下属的所有文件及其子目录均删除掉。对于链接文件，只是删除整个链接文件，而原有文件保持不变。
+rmdir | ReMove DIRectory | 用来删除空目录。
+rmmod | ReMove MODule | 用于从当前运行的内核中移除指定的内核模块。
+rpm | RPM/Redhat Package Manager | RPM软件包的管理工具。
+sed | Stream EDitor | 一种流编辑器，它是文本处理中非常中的工具，能够完美的配合正则表达式使用，功能不同凡响。
+ssh | Secure SHell | openssh套件中的客户端连接工具，可以给予ssh加密协议实现安全的远程登录服务器。
+su | Substitute User | "替代用户"，切换当前用户身份到其他用户身份，变更时须输入所要变更的用户帐号与密码。
+sudo | SuperUser DO | 用来以其他身份来执行命令，预设的身份为root。
+sync | SYNChronize | 用于强制被改变的内容立刻写入磁盘，更新超块信息。
+vim | vi Improved | 是UNIX操作系统和类UNIX操作系统中最通用的全屏幕纯文本编辑器。Linux中的vi编辑器叫vim，它是vi的增强版（vi Improved），与vi编辑器完全兼容，而且实现了很多增强功能。(备注：神一样的编辑器！！！)
+yum | Yellow dog Updater, Modified | 在Fedora和RedHat以及SUSE中基于rpm的软件包管理器
+
+注：命令的具体解释可以参考这个网站：[Linux命令大全](Linux命令大全(手册)_Linux常用命令行实例详解_Linux命令学习手册)
+
+### 3. 编程相关缩写
+
+缩写 | 全称 | 说明
+--- | --- | ---
+cc | C Compiler |
+gcc | Gnu Compiler Collection | 作为一个软件集被你下载下来编译安装的时候
+gcc | Gnu C Compiler | 作为一个软件被你调用来编译C程序的时候
+g++ | Gnu c++ compiler | 其实g++只是调用gcc，然后连接c++的库，并且作相应的一些编译设置而已
+gcj | Gnu Compiler for Java |
+gdb | Gnu DeBug |
+
+### 4. 递归缩写
+
+缩写 | 全称 | 说明
+--- | --- | ---
+GNU | Gnu is Not Unix |
+PHP | PHP: Hypertext Preprocessor |
+RPM | RPM Package Manager |
+WINE | WINE Is Not an Emulator | Wine 是类UNIX系统下运行微软Windows程序的"兼容层"。在Wine中运行的Windows程序，就如同运行原生Linux程序一样，不会有模拟器那样的性能问题。
+PNG | PNG's Not GIF |
+nano | Nano's ANOther editor |
+
+### 5. 其他缩写
+
+缩写 | 全称 | 说明
+--- | --- | ---
+tar | Tape Archive | “磁带档案卷”
+tcl | Tool Command Language | Tcl（发音 tickle）是一种脚本语言。
+tty | teletypewriter | “电传打字机”，在类Unix里，键盘显示器，都是虚拟的teletypewriter
+tzselect |  Time Zone SELECT |
+
+### 6. 参考资料
+
+- [Linux中常用的命令都是哪些单词的缩写？](https://www.zhihu.com/question/49073893)
+- [(转)linux 目录结构及其含义](http://www.cnblogs.com/zhyryxz/archive/2012/05/03/2480242.html)
+- [Linux命令大全](http://man.linuxde.net/)
+- [Wine (简体中文)](https://wiki.archlinux.org/index.php/Wine_(%E7%AE%80%E4%BD%93%E4%B8%AD%E6%96%87))
+- [fstab (简体中文)](https://wiki.archlinux.org/index.php/Fstab_(%E7%AE%80%E4%BD%93%E4%B8%AD%E6%96%87))
+- [AWK 简明教程](http://coolshell.cn/articles/9070.html)
+- [缩写习惯](http://i.linuxtoy.org/docs/guide/ch02s02.html)
+- [Tcl](https://zh.wikipedia.org/wiki/Tcl?oldformat=true)
+- [Unix Command Acronyms](http://www.abbreviations.com/acronyms/UNIX)
+- [Linux常用缩写](http://blog.wangmingkuo.com/abbreviation-in-linux/)
