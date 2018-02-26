@@ -63,6 +63,8 @@
         - [while循环 条件不成立终止 unitl条件成立终止](#while%E5%BE%AA%E7%8E%AF-%E6%9D%A1%E4%BB%B6%E4%B8%8D%E6%88%90%E7%AB%8B%E7%BB%88%E6%AD%A2-unitl%E6%9D%A1%E4%BB%B6%E6%88%90%E7%AB%8B%E7%BB%88%E6%AD%A2)
         - [for循环](#for%E5%BE%AA%E7%8E%AF)
         - [bug调试](#bug%E8%B0%83%E8%AF%95)
+    - [账号管理](#%E8%B4%A6%E5%8F%B7%E7%AE%A1%E7%90%86)
+    - [文件系统管理](#%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F%E7%AE%A1%E7%90%86)
     - [maven仓库镜像](#maven%E4%BB%93%E5%BA%93%E9%95%9C%E5%83%8F)
     - [常用缩写](#%E5%B8%B8%E7%94%A8%E7%BC%A9%E5%86%99)
         - [1. 目录缩写](#1-%E7%9B%AE%E5%BD%95%E7%BC%A9%E5%86%99)
@@ -417,6 +419,7 @@ dd if=/dev/hdc of=/tmp/mbr.back bs=512 count=1
 
 ### 特殊  
 
+`替换` :n1,n2s/old/new/g 其中n2可以是$表示最后
 `区块选择` v字符选择 V行选择 ctrl+v区块选择 y复制 d删除  
 `多档案` :n 下一个档案 :N上一个档案 :files所有的档案  
 `多窗口` :sp 分成两个 :sp filename 分两个 ctrl+w +j/↓ 下一个窗口 ctrl+w +k/↑上一个窗口 ctrl+w +q离开  
@@ -1058,6 +1061,10 @@ echo "The result of '1+2+3+...+$nu' is ==> $s"
 alias ascii="awk 'BEGIN{H=19;for(n=0;n<H;n++){for(m=0;m<=4;m++){if(n==0){h=h\"\x1b[1;31mC \x1b[37m:\x1b[36mOct\x1b[37m:\x1b[35mHex\x1b[37m:\x1b[33mDec\x1b[m  \";l=l\"================\"}c=32+n+m*H;p=p sprintf(\"\x1b[1;31m%c \x1b[37m:\x1b[36m%03o\x1b[37m:\x1b[35m%2Xh\x1b[37m:\x1b[33m%-3d\x1b[m  \",c,c,c,c)}if(n==0)print h\"\n\"l;print p;p=\"\"}}'"  
 ```
 
+## 账号管理
+
+## 文件系统管理
+
 ## maven仓库镜像
 
 > 下载工具  
@@ -1152,7 +1159,7 @@ sync | SYNChronize | 用于强制被改变的内容立刻写入磁盘，更新�
 vim | vi Improved | 是UNIX操作系统和类UNIX操作系统中最通用的全屏幕纯文本编辑器。Linux中的vi编辑器叫vim，它是vi的增强版（vi Improved），与vi编辑器完全兼容，而且实现了很多增强功能。(备注：神一样的编辑器！！！)
 yum | Yellow dog Updater, Modified | 在Fedora和RedHat以及SUSE中基于rpm的软件包管理器
 
-注：命令的具体解释可以参考这个网站：[Linux命令大全](Linux命令大全(手册)_Linux常用命令行实例详解_Linux命令学习手册)
+注：命令的具体解释可以参考这个网站：[Linux命令大全](http://man.linuxde.net/)_Linux常用命令行实例详解_Linux命令学习手册)
 
 ### 3. 编程相关缩写
 
