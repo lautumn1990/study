@@ -64,6 +64,7 @@
         - [for循环](#for%E5%BE%AA%E7%8E%AF)
         - [bug调试](#bug%E8%B0%83%E8%AF%95)
     - [账号管理](#%E8%B4%A6%E5%8F%B7%E7%AE%A1%E7%90%86)
+        - [帐号管理](#%E5%B8%90%E5%8F%B7%E7%AE%A1%E7%90%86)
     - [文件系统管理](#%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F%E7%AE%A1%E7%90%86)
     - [maven仓库镜像](#maven%E4%BB%93%E5%BA%93%E9%95%9C%E5%83%8F)
     - [常用缩写](#%E5%B8%B8%E7%94%A8%E7%BC%A9%E5%86%99)
@@ -77,7 +78,8 @@
 ## 经典语句
 
 > 在Windows里面,设定不好设备,您可以骂它;在Linux里面,如果设定好设备了,您得要感激它!  
-> 没有安装过Linux十次以上,不要说你学会了Linux了啦!慢慢体会这句话吧! ^_^
+> 没有安装过Linux十次以上,不要说你学会了Linux了啦!慢慢体会这句话吧! ^_^  
+> 没有信息就是『好信息』！  
 
 ## 硬盘
 
@@ -1063,7 +1065,501 @@ alias ascii="awk 'BEGIN{H=19;for(n=0;n<H;n++){for(m=0;m<=4;m++){if(n==0){h=h\"\x
 
 ## 账号管理
 
+输入账号的过程
+
+1. 先找/etc/passwd中是否有帐号，有则读出UID/GID,其中GID在/etc/group中,同时还有家目录与shell配置
+2. 核对口令,在/etc/shadow中
+3. 如果正确则shell掌控
+
+/etc/passwd 中的数据说明  
+head -n 1 /etc/passwd
+root:x:0:0:root:/root:/bin/bash
+账户名称:口令:UID:GID:用户信息栏:家目录:shell
+
+1. 帐号名称:用来查找UID
+1. 口令:早期在此,后因安全放入/etc/shadow所以为x
+1. UID:user id 其中0系统管理员 1-499系统帐号,一般不可登录 500-65535一般使用者(早已超过此限制)
+1. GID:group id在/etc/group中
+1. 用户信息说明栏:解释帐号,可用finger查看chfn修改
+1. 家目录:登录之后的家目录
+1. shell:用于沟通的shell
+
+/etc/shadow 中的数据说明
+head -n 1 /etc/shadow
+root:$1$/30QpE5e$y9N/D0bh6rAACBEz.hqo00:14126:0:99999:7:::
+帐户名称:口令:最近改动日期:不可变动日期:需变更日期:警告日期:宽限日期:失效日期:保留
+
+1. 帐号名称:与/etc/group对应
+1. 口令:加密后的密码$1$表示加密类型,其中MD5加密,$2$Blowfish,$5$SHA-256,$6$SHA-512,!!表示过期,*代表锁定,/30QpE5e为加密盐
+1. 最近改动日期:和1970/01/01相比的天数
+1. 不可变动日期:改动之后多久不能再改
+1. 需变更日期:改动之后多久需要再改
+1. 警告日期:变更前警告
+1. 宽限日期:变更日期多久之后还能用,但登陆之后要求更改
+1. 失效日期:强制失效,可用在收费系统中
+1. 保留:暂时没有功能
+
+例子
+dmtsai:$1$vyUuj.eX$omt6lKJvMcIZHx4H7RI1V.:14299:5:60:7:5:14419:
+用户为dmtasi;加密类型为MD5,加密盐vyUuj.eX,之后是密码密文;最近一次修改密码日期2009/02/24(1970/01/01 +14299天);之后5天不可修改(2009/03/01);需变更日期14299+60=14359即2009/04/25;警告日期7天2009/04/19-2009/04/25,即14299-60-7;如果2009/04/25没有改密码,2009/04/30之前还可登录主机,不过强制改密码,如果改了变动日期就重新计算;不论怎么改14419之后就过期
+
+群组
+/etc/group 中的数据说明
+head -n 1 /etc/group
+root:x:0:root
+组名:群组口名:GID:支持的帐号
+
+1. 组名:群组名称
+1. 群组口名:群组的口令,移到/etc/gshadow
+1. GID:group id
+1. 支持的帐号:群组支持的帐号,多个逗号分隔,如root,dmtasi
+
+有效群组
+由于一个帐号可以加入多个群组,所以当前的群组为有效群组
+/etc/passwd中的GID为初始群组,可以使用`usermod -G users dmtasi`配置次要群组,这样/etc/group的users就增加了demasi
+`groups`可查看当前用户加入的群组,其中第一个是有效群组,touch txt的时候创建txt的group,可以使用newgrp切换,如`newgrp users`
+
+/etc/gshadow 中的数据说明
+head -n 1 /etc/gshadow
+root:::root
+组名:群口令:管理员帐号:支持的帐号
+
+群口令:!开头证明不合法
+
+### 帐号管理
+
+useradd 新增用户
+useradd [-u UID] [-g 初始群组] [-G 次要群组] [-mM] [-c 说明栏] [-d 家目录绝对路径] [-s shell] 使用者账号名
+参数:-u后跟UID -g初始化群组/etc/passwd -G支持群组/etc/group -M不创建家目录 -m创建家目录,默认 -c说明栏 -d指定家目录 -r系统帐号,默认无家目录不可登录,在/etc/login.defs配置 -s默认shell -e失效日期 -f/etc/shadow第七个字段,0立刻失效,-1永不失效
+
+useradd lautumn创建一般帐号
+
+- 在 /etc/passwd 里面创建一行与账号相关的数据，包括创建 UID/GID/家目录等；
+- 在 /etc/shadow 里面将此账号的口令相关参数填入，但是尚未有口令；
+- 在 /etc/group 里面加入一个与账号名称一模一样的组名；
+- 在 /home 底下创建一个与账号同名的目录作为用户家目录，且权限为 700
+
+useradd -r lautumn2创建系统帐号,uid,gid小于500,不会创建家目录
+
+useradd参考文档 useradd -D显示 GROUP默认群组,HOME路径,INACTIVE口令失效日期-1不失效,EXPIRE帐号失效日期,SHELL默认路径,SKEL家目录参考数据,CREATE_MAIL_SPOOL是否主动创建mail
+除此文档,还有/etc/login.defs 密码失效日期,uid取值范围,默认家目录的umask,加密类型,是否创建家目录等信息
+
+passwd 配置密码
+新创建的用户不配置密码不可使用,`passwd lautumn`修改lautumn的密码,passwd修改自己的密码
+passwd [--stdin] 从输入流中读取密码,所有人可用
+passwd [-l] [-u] [--stdin] [-S] [-n 日数] [-x 日数] [-w 日数] [-i 日期] 账号 仅root可用 参数-l锁定 -u解锁 -S显示shadow信息 -n多久不可修改 -x多久必改 -w警告天数 -i口令失效天数
+echo "abc543CC" | passwd --stdin lautumn  
+修改密码 会留在shell历史中~/.bash_history中
+
+chage修改密码日期  比passwd修改日期详细  
+chage [-ldEImMW] 账号名 参数 -l列出详情 -d 三 修改最近日期 YYYY-MM-DD -E 八 修改帐号失效日期YYYY-MM-DD,-I 七 口令失效日期,-m 四 不可更改日期,-M 五 多久必须更改,-W 六 警告日期
+chage -d 0 lautumn 可让lautumn第一次登录即要更改密码  
+
+usermod 账户修改
+usermod [-cdegGlsuLU] username 参数 -c第五栏说明 -d家目录 -e帐号失效日,第八YYYY-MM-DD -f口令失效日,第七 -g初始群组 -G次要群组 -a与-G可用原基础上添加 -l修改名称第一栏 -sshell路径 -uUID -L冻结 -U解冻  
+
+userdel 账户删除
+userdel [-r] username 参数-r连目录也删除 如果要完整删除 可先`find / -user username`然后删除
+
+用户功能
+finger查看信息
+finger [-s] username 参数 -s仅列出用户的账号、全名、终端机代号与登陆时间等等  
+chfn change finger修改finger信息
+chfn [-foph] [账号名] 参数-f  ：后面接完整的大名；-o  ：您办公室的房间号码；-p  ：办公室的电话号码；-h  ：家里的电话号码！ 一般用不到
+
+chsh 修改shell
+chsh [-ls] 参数 -l列出shell -s配置shell
+
+id 查询UID与GID
+id [username]
+
+管理群组
+group 新增群组
+groupadd [-g gid] [-r] 组名 参数 --g指定GID -r系统群组
+
+groupmod 修改群组
+groupmod [-g gid] [-n group_name] 群组名 参数-g修改GID -n修改名称 不要随意改
+
+groupdel 删除群组
+
+gpasswd 群组管理员
+root用法
+gpasswd groupname
+gpasswd [-A user1,...] [-M user3,...] groupname
+gpasswd [-rR] groupname
+参数 -A管理员 -M加入用户 -r移除口令 -R口令失效
+
+管理员用法
+gpasswd [-ad] user groupname 参数-a添加 -d删除
+
+权限管理问题
+如果project目录为gp群组,权限为2770,用户A不是gp中的成员,想看project中的内容,但是不可修改,如果将文件的权限提升2775,则用户B也可查看了,不可做到细部控制
+权限细部规划 ACL Access Control List 可以针对用户和群组进行细部控制  
+mount -o remount,acl 加入acl功能 也可修改 /etc/fstab 改为default,acl
+
+setfacl设置
+getfacl查看
+
+setfacl [-bkRd] [{-m|-x} acl参数] 目标文件名 参数-m配置参数 -x删除参数 -b移除所有 -k移除默认 -R递归配置 -d配置默认
+setfacl -m u:vbird1:rx acl_test1 其中u:使用者:权限  
+
+getfacl filename 查看权限 其中mask为最高权限
+
+用户身份切换
+使用一般者操作,避免出错;安全;软件本身限制,如telnet不允许root登录
+su - [username]  Substitute User替代用户 参数-l - 重新读取参数配置 -c跟command仅执行一次 -m-p使用目前的环境配置
+sudo [-b] [-u 新使用者账号] 参数-b背景执行 -u切换的使用者,无-u为root  要保证用户有新用户的使用权限,且新用户有执行命令的权限,第一次要输入口令,root不用
+visudo 修改/etc/sudoers 配置sudo的用户及权限,退出可校验
+用户群组     登录者来源主机=(可切换身份)   可下达命令
+root        ALL=(ALL)                   ALL
+%wheel      ALL=(ALL)                   ALL
+%wheel      ALL=(ALL)                   NOPASSWD: ALL
+其中%代表群组,NOPASSWD不需要密码
+
+限制操作
+myuser1 ALL=(root)  /usr/bin/passwd
+可使用root权限运行passwd,但 sudo passwd是修改root密码,可进一步进行限制
+myuser1 ALL=(root)  !/usr/bin/passwd, /usr/bin/passwd [A-Za-z]*, !/usr/bin/passwd root
+避免输入错误,修改root密码  
+
+设置别名
+User_Alias ADMPW = pro1, pro2, pro3, myuser1, myuser2
+Cmnd_Alias ADMPWCOM = !/usr/bin/passwd, /usr/bin/passwd [A-Za-z]*, \
+                      !/usr/bin/passwd root
+ADMPW   ALL=(root)  ADMPWCOM
+
+默认时间间隔5分钟,不用输入密码,可在visudo中修改,Defaults env_reset,timestamp_timeout=20修改为20分钟
+
+sudo 搭配 su 的使用方式,可以用自己的口令变成root,避免root密码泄漏  
+User_Alias  ADMINS = pro1, pro2, pro3, myuser1
+ADMINS ALL=(root)  /bin/su -
+
+/sbin/nologin提示语句在/etc/nologin.txt中修改  
+
+PAM模块(Pluggable Authentication Modules, 嵌入式认证模块)
+
+passwd呼叫的PAM流程
+
+1. 用户开始运行 /usr/bin/passwd 这支程序，并输入口令；
+1. passwd 呼叫 PAM 模块进行验证；
+1. PAM 模块会到 /etc/pam.d/ 找寻与程序 (passwd) 同名的配置文件；
+1. 依据 /etc/pam.d/passwd 内的配置，引用相关的 PAM 模块逐步进行验证分析；
+1. 将验证结果 (成功、失败以及其他信息) 回传给 passwd 这支程序；
+1. passwd 这支程序会根据 PAM 回传的结果决定下一个动作 (重新输入新口令或者通过验证！)
+
+```shell
+cat /etc/pam.d/passwd
+#%PAM-1.0  <==PAM版本的说明而已！
+auth       include      system-auth <==每一行都是一个验证的过程
+account    include      system-auth
+password   include      system-auth
+验证类别   控制标准     PAM 模块与该模块的参数
+```
+
+第一个字段验证类别 有auth认证 account授权 session会话 password口令修改变更  
+有顺序,因为先验证身份,然后授权,配置环境信息,才可修改密码.
+
+第二个字段验证控制旗标
+required成功失败均继续 requisite失败中止 sufficient成功中止 optional显示信息
+
+其他相关文件
+limits.conf主机使用限制
+
+/var/log/secure, /var/log/messages PAM 模块会记录在secure中
+
+用户传递信息  
+w who last lastlog 查询使用者
+
+对谈 write mesg wall
+write 使用者账号 [用户所在终端接口] who先查看在线用户,输入信息,使用ctrl+d退出
+mesg n 不接受信息,但root发的必须接收
+wall广播,所有在线人收到
+
+mail邮件
+离线时可用 mail -s 'subject' username 给某人发mail  
+mail查看邮件
+
+手动新增使用者
+pwck查看/etc/passwd配置的家目录是否有信息
+pwconv将/etc/passwd中的口令移到/etc/shadow
+pwunconv 移回口令并删除/etc/shadow
+chpasswd修改口令 常用参数-m从输入流中读取
+
+批量建账号
+
+```shell
+#!/bin/bash
+#
+# 这支程序主要在帮您创建大量的账号之用，更多的使用方法请参考：
+# http://vbird.dic.ksu.edu.tw/linux_basic/0410accountmanager.php#manual_amount
+#
+# 本程序为鸟哥自行开发，在 CentOS 5.x 上使用没有问题，
+# 但不保证绝不会发生错误！使用时，请自行负担风险～
+#
+# History:
+# 2005/09/05    VBird   刚刚才写完，使用看看先～
+# 2009/03/04    VBird   加入一些语系的修改与说明，修改口令产生方式 (用 openssl)
+export LANG=zh_TW.big5
+export PATH=/sbin:/usr/sbin:/bin:/usr/bin
+accountfile="user.passwd"
+
+# 1. 进行账号相关的输入先！
+echo ""
+echo "例如我们昆山四技的学号为： 4960c001 到 4960c060 ，那么："
+echo "账号开头代码为         ：4"
+echo "账号层级或年级为       ：960c"
+echo "号码数字位数为(001~060)：3"
+echo "账号开始号码为         ：1"
+echo "账号数量为             ：60"
+echo ""
+read -p "账号开头代码 ( Input title name, ex> std )======> " username_start
+read -p "账号层级或年级 ( Input degree, ex> 1 or enter )=> " username_degree
+read -p "号码部分的数字位数 ( Input \# of digital )======> " nu_nu
+read -p "起始号码 ( Input start number, ex> 520 )========> " nu_start
+read -p "账号数量 ( Input amount of users, ex> 100 )=====> " nu_amount
+read -p "口令标准 1) 与账号相同 2)随机数自定义 ==============> " pwm
+if [ "$username_start" == "" ]; then
+        echo "没有输入开头的代码，不给你运行哩！" ; exit 1
+fi
+# 判断数字系统
+testing0=$(echo $nu_nu     | grep '[^0-9]' )
+testing1=$(echo $nu_amount | grep '[^0-9]' )
+testing2=$(echo $nu_start  | grep '[^0-9]' )
+if [ "$testing0" != "" -o "$testing1" != "" -o "$testing2" != "" ]; then
+        echo "输入的号码不对啦！有非为数字的内容！" ; exit 1
+fi
+if [ "$pwm" != "1" ]; then
+        pwm="2"
+fi
+
+# 2. 开始输出账号与口令文件！
+[ -f "$accountfile" ] && mv $accountfile "$accountfile"$(date +%Y%m%d)
+nu_end=$(($nu_start+$nu_amount-1))
+for (( i=$nu_start; i<=$nu_end; i++ ))
+do
+        nu_len=${#i}
+        if [ $nu_nu -lt $nu_len ]; then
+                echo "数值的位数($i->$nu_len)已经比你配置的位数($nu_nu)还大！"
+                echo "程序无法继续"
+                exit 1
+        fi
+        nu_diff=$(( $nu_nu - $nu_len ))
+        if [ "$nu_diff" != "0" ]; then
+                nu_nn=0000000000
+                nu_nn=${nu_nn:1:$nu_diff}
+        fi
+        account=${username_start}${username_degree}${nu_nn}${i}
+        if [ "$pwm" == "1" ]; then
+                password="$account"
+        else
+                password=$(openssl rand -base64 6)
+        fi
+        echo "$account":"$password" | tee -a "$accountfile"
+done
+
+# 3. 开始创建账号与口令！
+cat "$accountfile" | cut -d':' -f1 | xargs -n 1 useradd -m
+chpasswd < "$accountfile"
+pwconv
+echo "OK！创建完成！"
+
+
+```
+
+批量删帐号
+
+```shell
+#!/bin/bash
+usernames=$(cat user.passwd | cut -d ':' -f 1)
+for username in $usernames
+do
+    echo "userdel -r $username"
+    userdel -r $username
+```
+
 ## 文件系统管理
+
+Quota磁碟配额
+由于多人环境,如果一个人用的磁盘太多其他人可用的资源就少了,所以可通过quota进行配置
+要求:仅能针对filesystem,核心必须支持quota,quota记录文件的变化以前quota.user,quota.group;现在aquota.user,aquota.group;只针对一般使用者  
+可配置的项目 block inode
+限制级别 soft hard
+倒计时天数 grace time 到了soft之后,如果过了grace time就不能再增加文件了
+
+添加系统支持
+mount -o remount,userquota,grpquota /home 其中/home为单独的文件系统  
+也可修改/etc/fstab ,然后mount -a重新挂载
+LABEL=/home   /home  ext3   defaults,usrquota,grpquota  1 2
+
+创建记录文件
+quotacheck [-avugfM] [/mount_point] 参数-a扫描/etc/mtab 支持的quota的filesystem -u针对使用情况创建aquota.user -g创建aquota.group -v显示过程 -f强制扫描 -M强制读写  
+一般使用 quotacheck -avug 即可
+
+启动quota服务
+quotaon [-avug]
+quotaon [-vug] [/mount_point]
+
+关闭quota服务
+quotaoff [-a] 全部关闭
+quotaoff [-ug] [/mount_point]
+
+edquota ：编辑帐号/群组的限值与宽限时间
+edquota [-u username] [-g groupname]
+edquota -t  <==修改宽限时间
+edquota -p 范本帐号 -u 新帐号
+
+显示限制值
+quota [-uvs] [username]
+quota [-gvs] [groupname]
+参数-s 以1024为单位加M
+
+repquota -a [-vugs]显示所有用户情况
+
+warnquota ：对超过限额者发出警告信 可配合定时任务执行  
+通过mail发送可修改/etc/warnquota.conf中的模版  不适合/var/spool/mail也在爆表的quota管理中  
+
+setquota直接配置限额,不用进入edquota的管理界面,时候shell脚本  
+setquota [-u|-g] 名称 block(soft) block(hard) inode(soft) inode(hard) 文件系统  
+setquota -u myquota5 100000 200000 0 0 /home
+
+RAID磁盘阵列 容错式廉价磁盘阵列(Redundant Arrays of Inexpensive Disks, RAID)  
+RAID-0 (等量模式, stripe)：效能最佳,至少两个
+RAID-1 (映射模式, mirror)：完整备份,至少两个
+RAID 0+1，RAID 1+0 结合两个的有点
+RAID 3: 一块单独的盘做校验盘,可坏一块,但校验盘的读写频率太高
+RAID 5：校验值每次取在不同的硬盘,效能与数据备份的均衡考量,可坏一块
+RAID 6:通过算法校验码分散在两块硬盘,可坏两块
+
+| RAID级别 | 冗余磁盘 | 空间利用率 | 性能 | 可靠性 |
+|----------|----------|------------|------|--------|
+| 0        | 0颗      | 100%       | 最高 | 最低   |
+| 1        | n/2颗    | 50%        | 低   | 最高   |
+| 3        | 1颗      | (n-1)/n    | 较高 | 较低   |
+| 5        | 1颗      | (n-1)/n    | 较高 | 较低   |
+| 6        | 2颗      | (n-2)/n    | 较低 | 较高   |
+
+优点:
+
+- 数据安全与可靠性：指的并非资讯安全，而是当硬件 (指磁碟) 损毁时，数据是否还能够安全的救援或使用之意；
+- 读写效能：例如 RAID 0 可以加强读写效能，让你的系统 I/O 部分得以改善；
+- 容量：可以让多颗磁碟组合起来，故单一文件系统可以有相当大的容量。
+
+software, hardware RAID  
+硬件磁盘阵列并不会重复消耗原本系统的 I/O 汇流排,性能好,但贵  
+linux下可用mdadm套件模拟RAID
+
+mdadm
+mdadm --detail /dev/md0
+mdadm --create --auto=yes /dev/md[0-9] --raid-devices=N  --level=[015] --spare-devices=N /dev/sdx /dev/hdx...
+参数 --create ：为创建 RAID --auto=yes ：决定创建后面接的软件磁盘阵列装置，亦即 /dev/md0, /dev/md1... --raid-devices=N ：使用几个磁碟 (partition) 作为磁盘阵列的装置 --spare-devices=N ：使用几个磁碟作为备用 (spare) 装置 --level=[015] ：配置这组磁盘阵列的等级。支持很多，不过建议只要用 0, 1, 5 即可 --detail ：后面所接的那个磁盘阵列装置的详细资讯
+
+最好大小一样
+mdadm --create --auto=yes /dev/md0 --level=5 --raid-devices=4 --spare-devices=1 /dev/hda{6,7,8,9,10}
+mdadm --detail /dev/md0
+cat /proc/mdstat
+mkfs -t ext3 /dev/md0 格式化
+mkdir /mnt/raid
+mount /dev/md0 /mnt/raid 挂载
+df查看
+
+模拟救援
+mdadm --manage /dev/md[0-9] [--add 装置] [--remove 装置] [--fail 装置]  
+mdadm --manage /dev/md0 --fail /dev/hda8
+mdadm --detail /dev/md0  
+cat /proc/mdstat
+
+移除错误磁盘
+ mdadm --manage /dev/md0 --add /dev/hda11 --remove /dev/hda8
+
+自动挂载
+mdadm --detail /dev/md0 | grep -i uuid # 查看uuid
+vi /etc/mdadm.conf #配置 ARRAY /dev/md0 UUID=7c60c049:57d60814:bd9a77f1:57e49c5b
+在/etc/fstab中加入md0 /dev/md0    /mnt/raid    ext3    defaults     1 2
+mount -a挂载 df /mnt/raid 查看
+
+关闭RAID
+umount /dev/md0
+vi /etc/fstab ~~/dev/md0    /mnt/raid     ext3    defaults      1 2~~ 删除
+mdadm --stop /dev/md0 关闭 --stop /dev/md0
+cat /proc/mdstat 查看状态
+vi /etc/mdadm.conf 删除 ~~ARRAY /dev/md0 UUID=7c60c049:57d60814:bd9a77f1:57e49c5b
+~~
+
+LVM 逻辑卷轴管理员 (Logical Volume Manager)  
+可以弹性调整的filesystem  
+概念
+Physical Volume, PV, 实体卷轴 system id 8e  
+Volume Group, VG, 卷轴群组
+Pysical Extend, PE, 实体延伸区块
+Logical Volume, LV, 逻辑卷轴
+
+图片示意图  
+![lvm](image/lvm-arch.png)  
+![lvm](image/lvm.gif)
+
+默认线性模式 (linear)：一个用完一个用;交错模式 (triped)：像raid0,一份数据拆成几份  
+
+pv阶段
+pvscan
+pvcreate /dev/hda{6,7,8,9}
+pvdisplay
+
+VG阶段
+vgcreate [-s N[mgt]] VG名称 PV名称 参数-s后面接 PE 的大小 (size) ，单位可以是 m, g, t (大小写均可)
+vgcreate -s 16M vbirdvg /dev/hda{6,7,8}
+vgscan
+pvscan
+vgdisplay
+vgextend vbirdvg /dev/hda9 添加
+vgdisplay
+
+LV阶段
+lvcreate [-L N[mgt]] [-n LV名称] VG名称 -L跟容量单位 M,G,T,必须是PE的倍数
+lvcreate [-l N] [-n LV名称] VG名称 -l PE个数,后面接的就是 -n LV,的名称啦！
+lvcreate -l 356 -n vbirdlv vbirdvg
+ll /dev/vbirdvg/vbirdlv
+lvdisplay
+
+文件系统阶段
+mkfs -t ext3 /dev/vbirdvg/vbirdlv 格式化
+mkdir /mnt/lvm  
+mount /dev/vbirdvg/vbirdlv /mnt/lvm 挂载
+
+放大容量
+pvcreate /dev/hda10
+pvscan
+vgextend vbirdvg /dev/hda10 放大
+vgdisplay 查看vg
+lvdisplay 查看lv
+dumpe2fs /dev/vbirdvg/vbirdlv 查看文件系统信息
+resize2fs [-f] [device] [size] 修改文件系统大小 参数-f强制 size参数M,G不跟即使全部
+
+减小容量
+pvdisplay 查看要减小物理分区的大小
+pvscan 检查大小
+resize2fs /dev/vbirdvg/vbirdlv 6900M 查看后重新分配
+umount /mnt/lvm卸载
+lvresize -l -89 /dev/vbirdvg/vbirdlv 减小lv容量
+lvdisplay
+pvdisplay
+pvmove /dev/hda6 /dev/hda10  
+vgreduce vbirdvg /dev/hda6 移除hda6
+pvscan
+pvremove /dev/hda6 使hda6不在是pv
+
+还可利用lvm建快照系统
+
+常用命令  
+| 任务                | PV 阶段   | VG 阶段   | LV 阶段             |
+|---------------------|-----------|-----------|---------------------|
+| 搜寻(scan)          | pvscan    | vgscan    | lvscan              |
+| 创建(create)        | pvcreate  | vgcreate  | lvcreate            |
+| 列出(display)       | pvdisplay | vgdisplay | lvdisplay           |
+| 添加(extend)        | 　        | vgextend  | lvextend (lvresize) |
+| 减少(reduce)        | 　        | vgreduce  | lvreduce (lvresize) |
+| 删除(remove)        | pvremove  | vgremove  | lvremove            |
+| 改变容量(resize)    | 　        | 　        | lvresize            |
+| 改变属性(attribute) | pvchange  | vgchange  | lvchange            |
 
 ## maven仓库镜像
 
