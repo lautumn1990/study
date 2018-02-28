@@ -1,0 +1,1 @@
+#f::Run C:\LS\Everything\Everything.exe
