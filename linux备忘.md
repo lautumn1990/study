@@ -72,6 +72,9 @@
         - [子程序与父程序](#%E5%AD%90%E7%A8%8B%E5%BA%8F%E4%B8%8E%E7%88%B6%E7%A8%8B%E5%BA%8F)
         - [程序呼叫流程](#%E7%A8%8B%E5%BA%8F%E5%91%BC%E5%8F%AB%E6%B5%81%E7%A8%8B)
         - [SELinux用法](#selinux%E7%94%A8%E6%B3%95)
+    - [系统服务](#%E7%B3%BB%E7%BB%9F%E6%9C%8D%E5%8A%A1)
+        - [详解xinet程序](#%E8%AF%A6%E8%A7%A3xinet%E7%A8%8B%E5%BA%8F)
+    - [日志文件](#%E6%97%A5%E5%BF%97%E6%96%87%E4%BB%B6)
     - [maven仓库镜像](#maven%E4%BB%93%E5%BA%93%E9%95%9C%E5%83%8F)
     - [常用缩写](#%E5%B8%B8%E7%94%A8%E7%BC%A9%E5%86%99)
         - [1. 目录缩写](#1-%E7%9B%AE%E5%BD%95%E7%BC%A9%E5%86%99)
@@ -1907,6 +1910,251 @@ semanage fcontext -a -t public_content_t "/srv/samba(/.*)?"  添加一条数据
 cat /etc/selinux/targeted/contexts/files/file_contexts.local 写入此文件中  
 restorecon -Rv /srv/samba*  修改为默认值  
 ll -Zd /srv/samba
+
+## 系统服务
+
+系统服务常住系统内存,是service 而系统服务一般是daemon程序提供的功能,如httpd/crond,后缀一般为d即daemon
+
+daemon的主要分类  
+启动方式分类:stand alone daemon 和super daemon  
+stand alone可以单独启动,独立提供服务,如httpd/vsftpd  
+super daemon这种服务通过一个统一的daemon来管理,这个daemon被称为super daemon,早期是inetd,现在是xinet.d,没有客服端的要求各服务都未启动,等到客户端有需求时,才由super daemon唤醒对应的服务.服务结束,关闭服务,释放系统资源. 可提供类似防火墙的防护机制,但响应慢  
+工作形态分类:signal-control信号管理, interval-control周期管理  
+可通过man 3 daemon查看  
+
+服务与端口对应  
+可通过/etc/servcies中进行查看默认的配置,不建议修改  
+
+daemon的启动方式  
+主要目录  
+/etc/init.d/* ：启动脚本放置处  
+/etc/sysconfig/* ：各服务的初始化环境配置文件  
+/etc/xinetd.conf, /etc/xinetd.d/* ：super daemon 配置文件  
+/etc/* ：各服务各自的配置文件  
+/var/lib/* ：各服务产生的数据库  
+/var/run/* ：各服务的程序之 PID 记录处  
+
+stand alone启动  
+在/etc/init.d/* 启动  一般在次目录下放置服务的启动脚本  
+/etc/init.d/syslog status 查看状态  
+/etc/init.d/syslog start 启动 restart重启 stop关闭
+
+或者使用service命令进行简化 回去读取/etc/init.d/*中的脚本  
+service [service name] (start|stop|restart|...)  对服务进行的操作  
+service --status-all 查看所有服务状态
+
+service crond restart 等效于 /etc/init.d/crond restart  
+
+super daemon启动  
+在/etc/xinet.d/*中有配置文件  
+可通过grep -i 'disable' /etc/xinetd.d/* 进行查看 将disable=yes改为no可以默认启动,但需要重启xinet, 可通过/etc/init.d/xinetd restart 或者 service xinetd restart进行  
+
+### 详解xinet程序  
+
+xinetd是一个stand alone, xinetd的配置文件在/etc/xinetd.conf中  
+
+```shell
+vim /etc/xinetd.conf
+defaults
+{
+# 服务启动成功或失败，以及相关登陆行为的记录文件
+        log_type        = SYSLOG daemon info  #<==登录文件的记录服务类型
+        log_on_failure  = HOST   #<==发生错误时需要记录的信息为主机 (HOST)
+        log_on_success  = PID HOST DURATION EXIT #<==成功启动或登陆时的记录信息
+# 允许或限制联机的默认值
+        cps         = 50 10 #<==同一秒内的最大联机数为 50 个，若超过则暂停 10 秒
+        instances   = 50    #<==同一服务的最大同时联机数
+        per_source  = 10    #<==同一来源的客户端的最大联机数
+# 网络 (network) 相关的默认值
+        v6only          = no #<==是否仅允许 IPv6 ？可以先暂时不启动 IPv6 支持！
+# 环境参数的配置
+        groups          = yes
+        umask           = 002
+}
+includedir /etc/xinetd.d #<==更多的配置值在 /etc/xinetd.d 那个目录内
+```
+
+如果/etc/xinetd.d目录中没有特定的配置,则使用xinetd.conf中的配置  
+
+```shell
+#配置文件格式
+service  <service_name>
+{
+       <attribute>   <assign_op>   <value>   <value> ...
+       .............
+}
+```
+
+其中servcie_name与/etc/servcies中的配置有关, attribute是一些xinetd的管理参数,value是值,assgin_op是参数配置方法,如要有=配置这这样,+=增加,-=减少  
+attribute 主要有disable值为yes|no; id 服务名称唯一名称; server 路径名; server_args相关参数; user 服务所属用户; group 所属群组; socket_type封包类型[stream|dgram|raw]其中stream为TCP,dgram为UDP,raw为直接与ip对谈; protocol封包类型[tcp|udp]; wait联机机制[yes(single)|no(multi)]; instances最大联机数,per_source单一用户来源,每个ip最大连接数; cps新联机限制,两个数字,第一个为一秒内的个数,第二个为超过第一个数字的时侯服务关闭的时间; log_type登录等级,info warn等; log_on_success/log_on_failure登录状态:[PID,HOST,USERID,EXIT,DURATION]成功或失败后需要记录的信息; env配置环境变量; port自定义端口号; redirect服务转接地址[IP port]; includedir包含外部配置; bind绑定服务接口; interface与bind相同; only_from允许:[0.0.0.0, 192.168.1.0/24, hostname, domainname]; no_access阻止:[0.0.0.0, 192.168.1.0/24, hostname, domainname]; access_times时间管控:[00:00-12:00, HH:MM-HH:MM]; umask用户创建目录的属性  
+
+如rsync配置
+
+```shell
+# 先针对对内的较为松散的限制来配置：
+service rsync
+{
+        disable = no                        #<==要启动才行啊！
+        bind            = 127.0.0.1         #<==服务绑在这个接口上！
+        only_from       = 127.0.0.0/8       #<==只开放这个网域的来源登陆
+        no_access       = 127.0.0.{100,200} #<==限制这两个不可登陆
+        instances       = UNLIMITED         #<==取代 /etc/xinetd.conf 的配置值
+        socket_type     = stream            #<==底下的配置则保留
+        wait            = no
+        user            = root
+        server          = /usr/bin/rsync
+        server_args     = --daemon
+        log_on_failure  += USERID
+}
+
+# 再针对外部的联机来进行限制呢！
+service rsync
+{
+        disable = no
+        bind            = 192.168.1.100
+        only_from       = 140.116.0.0/16
+        only_from      += .edu.tw           #<==因为累加，所以利用 += 配置
+        access_times    = 01:00-9:00 20:00-23:59 #<==时间有两时段，有空格隔开
+        instances       = 10                #<==只有 10 条联机
+        socket_type     = stream
+        wait            = no
+        user            = root
+        server          = /usr/bin/rsync
+        server_args     = --daemon
+        log_on_failure  += USERID
+}
+```  
+
+xinetd进行防火墙管理  
+虽然在only_from和no_access可进行配置,但通过文件配置可集中管控
+/etc/hosts.deny, /etc/hosts.allow , 这两个文件也是tcpd的配置文件  
+
+TCP Wrappers 管控来源IP与整个网域的IP网段, port服务端口  
+只要支持TCP Wrappers的功能才可用/etc/hosts.{allow,deny}管控  
+可通过ldd $(which sshd httpd)来查看sshd和httpd的模块, ldd (library dependency discovery) , 查看是否支持libwrap.so  
+
+配置语法  
+
+```shell
+<service(program_name)> : <IP, domain, hostname> : <action>
+<服务   (亦即程序名称)> : <IP 或领域 或主机名> : < 动作 >
+# 上头的 < > 是不存在于配置文件中的喔！
+```
+
+校验规则  
+写在hosts.allow中文件可以不写第三栏allow, 在hosts.deny中的文件可以不写deny, 以/etc/hosts.allow优先, IP和网段如果没有在/etc/hosts.allow中则以/etc/hosts.deny判断  
+
+正常应该在允许的写在/etc/hosts.allow中, 不允许的写在/etc/hosts.deny中  
+第一个与第二个字段的特殊参数  
+
+- ALL：代表全部的 program_name 或者是 IP 都接受的意思，例如 ALL: ALL: deny
+- LOCAL：代表来自本机的意思，例如： ALL: LOCAL: allow
+- UNKNOWN：代表不知道的 IP 或者是 domain 或者是服务时；
+- KNOWN：代表为可解析的 IP, domain 等等信息时
+
+```shell
+#例子
+#只允许 140.116.0.0/255.255.0.0 与 203.71.39.0/255.255.255.0 这两个网域，及 203.71.38.123 这个主机可以进入我们的 rsync 服务器
+此外，其他的 IP 全部都挡掉！
+vim /etc/hosts.allow
+
+rsync:  140.116.0.0/255.255.0.0
+rsync:  203.71.39.0/255.255.255.0
+rsync:  203.71.38.123
+rsync:  LOCAL
+
+vim /etc/hosts.deny
+rsync: ALL
+```
+
+TCP Wrappers 特殊功能  
+如果耍要特殊的功能则可以安装tcp_wrappers可用yum安装  
+细部的动作主要有  
+spawn利用后接的shell进行额外的动作,且有变量功能主要为%h,%a,%d;  
+twist立刻执行后面的命令,且运行完后终止此次联机  
+
+```shell
+vim /etc/hosts.deny
+#利用safe_finger追踪对方的主机信息,以email的形式告知root, 告知对方他已被记录
+rsync : ALL: spawn (echo "security notice from host $(/bin/hostname)" ;\
+    echo; /usr/sbin/safe_finger @%h ) | \
+    /bin/mail -s "%d-%h security" root & \
+    : twist ( /bin/echo -e "\n\nWARNING connection not allowed.\n\n" )
+```
+
+系统开启的服务  
+netstat -tulp  查看当前的网络服务  
+netstat -lnp 找出所有的有监听网络的服务 (包含 socket 状态)  
+service --status-all 查看所有服务状态  
+
+启动后立即启动服务  
+
+1. 打开计算机电源，开始读取 BIOS 并进行主机的自我测试
+1. 透过 BIOS 取得第一个可启动装置，读取主要启动区 (MBR) 取得启动管理程序
+1. 透过启动管理程序的配置，取得 kernel 并加载内存且侦测系统硬件
+1. 核心主动呼叫 init 程序
+1. init 程序开始运行系统初始化 (/etc/rc.d/rc.sysinit)
+1. 依据 init 的配置进行 daemon start (/etc/rc.d/rc[0-6].d/*)
+1. 加载本机配置 (/etc/rc.d/rc.local)
+
+chkconfig --list [servicename]  查看服务  
+chkconfig [--level [0123456]] [servicename] [on|off] 参数 --list查看所有  --level配置在level下的状态  
+
+如 chkconfig --level 345 atd on
+
+ntsysv为图形管理模式  ntsysv --level 35 为redhat特有  
+
+添加系统服务  
+将写好的shell放入/etc/init.d/中; chkconfig --add servicename 添加; chkconfig --del servicename删除  
+
+## 日志文件
+
+日志文件: 记录系统活动资讯的几个文件， 例如：何时、何地 (来源 IP)、何人 (什么服务名称)、做了什么动作 (信息登录罗)。  
+作用:解决系统错误, 解决网络服务, 过往的记录  
+
+常见的日志  
+/var/log/cron定时任务日志, /var/log/dmesg硬件咨询, /var/log/lastlog最近一次登录, /var/log/maillog 或 /var/log/mail/* 日志, /var/log/messages错误信息, /var/log/secure 输入帐号口令, /var/log/wtmp登录者信息, /var/log/faillog错误登录者信息, /var/log/httpd/*, /var/log/news/*, /var/log/samba/*  
+
+主要由syslogd/klogd/logrotate负责记录  
+syslogd：主要登录系统与网络等服务的信息  
+klogd：主要登录核心产生的各项资讯  
+logrotate：主要在进行登录文件的轮替功能  
+
+syslog配置文件 /etc/syslog.conf, 规定了什么服务,什么等级,要记录到哪儿  
+
+```shell
+服务名称[.=!]信息等级       信息记录的档名或装置或主机
+# 底下以 mail 这个服务产生的 info 等级为例：
+mail.info       /var/log/maillog_info
+# 这一行说明：mail 服务产生的大於等於 info 等级的信息，都记录到
+# /var/log/maillog_info 文件中的意思。
+```
+
+服务名称 auth认证相关, cron定时任务, daemon服务软件信息, kern核心日志, lpr打印相关, mail邮件, news新闻服务器, syslog此服务本身, user, uucp, local0~local7机器本身的日志  
+
+信息等级  
+info说明 notice资讯 warning警示 err错误 crit严重错误 alert警告 emerg疼痛  
+
+还有两个特殊的debug错误侦测等级 none 不需要登录  
+.比之后高的都记录, .=仅此等级记录, .!不是此等级记录
+
+记录的位置  
+文件的绝对路径; 打印机或其他; 使用者名称; 远程主机; *目前上线的所有人  
+
+```shell
+#大于登录info,记录在/var/log/maillog中
+mail.info　　　/var/log/maillog
+
+#所有new/cron记录在cronnews,warn等级的news和cron记录在cronnews.warn文件中
+news.*;cron.*　　　　　/var/log/cronnews
+news.=warn;cron.=warn　/var/log/cronnews.warn
+
+#messages文件中不需要记录news,cron,mail两种写法均可
+*.*;news,cron,mail.none　　　　　　/var/log/messages
+*.*;news.none;cron.none;mail.none　/var/log/messages
+```
+
+修改syslog.conf完成后, 记得重启syslog服务 service syslog restart
 
 ## maven仓库镜像
 
