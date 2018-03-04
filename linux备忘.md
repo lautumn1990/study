@@ -75,6 +75,13 @@
     - [系统服务](#%E7%B3%BB%E7%BB%9F%E6%9C%8D%E5%8A%A1)
         - [详解xinet程序](#%E8%AF%A6%E8%A7%A3xinet%E7%A8%8B%E5%BA%8F)
     - [日志文件](#%E6%97%A5%E5%BF%97%E6%96%87%E4%BB%B6)
+    - [启动流程](#%E5%90%AF%E5%8A%A8%E6%B5%81%E7%A8%8B)
+    - [系统配置工具](#%E7%B3%BB%E7%BB%9F%E9%85%8D%E7%BD%AE%E5%B7%A5%E5%85%B7)
+    - [软件源码安装](#%E8%BD%AF%E4%BB%B6%E6%BA%90%E7%A0%81%E5%AE%89%E8%A3%85)
+    - [软件RPM安装](#%E8%BD%AF%E4%BB%B6rpm%E5%AE%89%E8%A3%85)
+    - [X window配置](#x-window%E9%85%8D%E7%BD%AE)
+    - [Linux备份策略](#linux%E5%A4%87%E4%BB%BD%E7%AD%96%E7%95%A5)
+    - [核心编译与管理](#%E6%A0%B8%E5%BF%83%E7%BC%96%E8%AF%91%E4%B8%8E%E7%AE%A1%E7%90%86)
     - [maven仓库镜像](#maven%E4%BB%93%E5%BA%93%E9%95%9C%E5%83%8F)
     - [常用缩写](#%E5%B8%B8%E7%94%A8%E7%BC%A9%E5%86%99)
         - [1. 目录缩写](#1-%E7%9B%AE%E5%BD%95%E7%BC%A9%E5%86%99)
@@ -1757,7 +1764,7 @@ top动态观察
 top [-d 数字] | top [-bnp]  参数-d接秒数多久更新一次 -b批量运行 -n进行几次top输出与-b联用 -p指定pid  
 top中的命令 ?显示帮助 P以CPU排序 M以Memory排序 N以PID排序 T以累积CPU时间排序 k给予一个process讯号 r重新定制nice值 q离开top  
 
-第一行 目前时间 启动到目前的时间 已经登录的人数 平均工作负载 1 5 15 
+第一行 目前时间 启动到目前的时间 已经登录的人数 平均工作负载 1 5 15  
 第二行 各状态的程序总数  
 第三行 CPU负载 1键切换核心 %wa 代表I/O wait  
 第四行 内存
@@ -2154,7 +2161,606 @@ news.=warn;cron.=warn　/var/log/cronnews.warn
 *.*;news.none;cron.none;mail.none　/var/log/messages
 ```
 
-修改syslog.conf完成后, 记得重启syslog服务 service syslog restart
+修改syslog.conf完成后, 记得重启syslog服务 service syslog restart 或者 /etc/init.d/syslog restart  
+
+logrotate进行日志文件的轮替  
+避免日志文件过大, 通过定时任务执行, 脚本在/etc/cron.daily/logrotate中  
+logrotate的配置档在 /etc/logrotate.conf和/etc/logrotate.d/文件中  
+其中/etc/logrorate.conf是主要配置文件,/etc/logrotate.d/文件配置一些细节,没有配置的为/etc/logrorate.conf中的配置  
+
+```shell
+vim /etc/logrotate.conf
+# 主要配置参数
+# 底下的配置是 "logrotate 的默认配置值" ，如果个别的文件配置了其他的参数，
+# 则将以个别的文件配置为主，若该文件没有配置到的参数则以这个文件的内容为默认值！
+
+weekly    #<==默认每个礼拜对登录文件进行一次 rotate 的工作
+rotate 4  #<==保留几个登录文件呢？默认是保留四个！
+create    #<==由於登录文件被更名，因此创建一个新的来继续储存之意！
+#compress #<==被更动的登录文件是否需要压缩？如果登录文件太大则可考虑此参数启动
+# dateext #<==以日期为后缀
+
+include /etc/logrotate.d
+# 将 /etc/logrotate.d/ 这个目录中的所有文件都读进来运行 rotate 的工作！
+
+/var/log/wtmp {       #<==仅针对 /var/log/wtmp 所配置的参数
+    monthly           #<==每个月一次，取代每周！
+    minsize 1M        #<==文件容量一定要超过 1M 后才进行 rotate (略过时间参数)
+    create 0664 root utmp #<==指定新建文件的权限与所属帐号/群组
+    rotate 1          #<==仅保留一个，亦即仅有 wtmp.1 保留而已。
+}
+# 这个 wtmp 可记录登陆者与系统重新启动时的时间与来源主机及登陆期间的时间。
+# 由於具有 minsize 的参数，因此不见得每个月一定会进行一次喔！要看文件容量。
+# 由於仅保留一个登录文件而已，不满意的话可以将他改成 rotate 5 吧！
+
+```
+
+```shell
+# /etc/logrorate.d/目录下的文件格式  
+登录文件的绝对路径档名 ... {
+    个别的参数配置值，如 monthly, compress 等等
+}
+vim /etc/logrotate.d/syslog
+/var/log/messages /var/log/secure /var/log/maillog /var/log/spooler \
+/var/log/boot.log /var/log/cron {
+  sharedscripts
+  postrotate
+    /bin/kill -HUP `cat /var/run/syslogd.pid 2> /dev/null` 2> /dev/null || true
+    /bin/kill -HUP `cat /var/run/rsyslogd.pid 2> /dev/null` 2> /dev/null || true
+  endscript
+}
+# 配置的意义为 针对/var/log内的六个文件有效, 每周轮替一次,保留4个, 不压缩, 轮替完毕后,取得syslog的PID, 用kill -HUP重启启动  
+```
+
+档名 可多个; 参数用{}包起来; 运行脚本用sharedscripts开始,endscript结束,运行环境为prerotate启动logrotate之前进行命令,postrotate运行logrorate之后启动命令,对于特殊处理相当重要  
+
+修改  
+
+```shell
+vi /etc/logrotate.d/syslog
+/var/log/messages /var/log/secure /var/log/maillog /var/log/spooler \
+/var/log/boot.log /var/log/cron {
+  sharedscripts
+  prerotate
+    /usr/bin/chattr -a /var/log/messages
+  endscript
+  sharedscripts
+  postrotate
+    /bin/kill -HUP `cat /var/run/syslogd.pid 2> /dev/null` 2> /dev/null || true
+    /bin/kill -HUP `cat /var/run/rsyslogd.pid 2> /dev/null` 2> /dev/null || true
+    /usr/bin/chattr +a /var/log/messages
+  endscript
+}
+# 对/var/log/messages文件先取消-a属性, 然后进行轮替, 最后给/var/log/messages加上a属性,防止被恶意修改或删除  
+
+```
+
+logrotate [-vf] logfile 其中参数 -v显示过程 -f强制进行rotate动作  
+
+分析日志文件  
+logwatch, CentOS5默认分析工具, 自动分析给root用户发文件  
+
+## 启动流程  
+
+linux的启动流程  
+
+1. 加载 BIOS 的硬件资讯与进行自我测试，并依据配置取得第一个可启动的装置
+1. 读取并运行第一个启动装置内 MBR 的 boot Loader (亦即是 grub, spfdisk 等程序)
+1. 依据 boot loader 的配置加载 Kernel ，Kernel 会开始侦测硬件与加载驱动程序
+1. 在硬件驱动成功后，Kernel 会主动呼叫 init 程序，而 init 会取得 run-level 资讯
+1. init 运行 /etc/rc.d/rc.sysinit 文件来准备软件运行的作业环境 (如网络、时区等)
+1. init 运行 run-level 的各个服务之启动 (script 方式)
+1. init 运行 /etc/rc.d/rc.local 文件
+1. init 运行终端机模拟程序 mingetty 来启动 login 程序，最后就等待使用者登陆啦
+
+BIOS启动, 启动自我测试与MBR  
+BIOS去加载CMOS中的配置, 取得主机的硬件配置, 如CPU与周边设备的沟通时脉,硬件的启动顺序,硬盘大小,系统时间,PnP设备,设备I/O地址等.  
+然后进行自我测试, 硬件侦测初始化, 配置PnP装置, 定义启动顺序, 启动MBR相关的任务  
+BIOS通过INT13中断功能, 读取MBR中的启动管理程序Boot Loader, 避免不同硬件之间的不兼容  
+
+Boot Loader功能  
+加载核心到主内存中去, 由于操作系统的文件格式不同, 所以每种操作系统都有自己的boot loader, 为了实现多系统, 可以将boot loader安装在boot sector中  
+boot loader 的主要功能: 提供菜单, 加载核心文件, 转交其他loader  
+所以可以通过菜单功能,转交给其他的loader  
+![boot_loader.png](image/boot_loader.png)  
+
+加载核心侦测硬件和initrd功能  
+boot loader读取核心文件后, 解压到主内存中, 并利用核心功能, 测试与驱动各个周边装置, 包括存储装置 cpu 网卡 声卡等. 此时linux核心重新侦测硬件 不一定会使用BIOS中的配置  
+核心文件一般在/boot中, 并且文件名为/boot/vmlinuz  
+为了加载方便, 核心一般通过动态加载核心模块(类似于驱动程序)的方式, 核心模块在/lib/modules/目录内, 由于/与/lib不可以放在不同的分区中. 启动过程必须挂在根目录,这样才能够取得核心模块提供的驱动程序, 启动过程中根目录以只读方式挂载  
+核心不认识SATA硬盘, 需要加载SATA的驱动程序, 否则无法挂载根目录, 但SATA的驱动程序在/lib/modules中, 这样无法挂载根目录如何取得驱动程序  
+linux通过虚拟文件系统解决此问题, 一般文件名为/boot/initrd, 可以通过boot loader加载到内存中, 在内存中解压模拟成根目录, 提供可运行的程序, 加载启动所需的核心模块, 通常是U盘,RAID,LVM,SCSI等文件系统的驱动程序, 加载完成后呼叫/sbin/init来开始后续的正常启动流程  
+![boot_loader_initrd.png](image/boot_loader_initrd.png)  
+可以不需要initrd, 如果硬盘是IDE的接口, 但如果是U盘, SATA, SCSI, LVM, RAID才会需要initrd  
+
+第一支程序 init 配置/etc/inittab 与runlevel  
+可通过pstree进行查看init为第一支程序, PID为1  
+runlevel等级, 七个
+0 halt 直接关机; 1 single user mode 单人维护模式; 2 Multi-user without NFS 多人模式无NFS服务; 3 Full multi-user mode 含网络功能的纯文字模式; 4 unused 系统保留功能; 5 X11加载图像; 6 reboot重新启动  
+默认不能将run level配置为0,4,6, 否则影响正常启动  
+
+```shell
+vim /etc/inittab
+id:5:initdefault:                 #<==默认的 runlevel 配置, 此 runlevel 为 5
+
+si::sysinit:/etc/rc.d/rc.sysinit  #<==准备系统软件运行的环境的脚本运行档
+
+# 7 个不同 run level 的，需要启动的服务的 scripts 放置路径：
+l0:0:wait:/etc/rc.d/rc 0    #<==runlevel 0 在 /etc/rc.d/rc0.d/
+l1:1:wait:/etc/rc.d/rc 1    #<==runlevel 1 在 /etc/rc.d/rc1.d/
+l2:2:wait:/etc/rc.d/rc 2    #<==runlevel 2 在 /etc/rc.d/rc2.d/
+l3:3:wait:/etc/rc.d/rc 3    #<==runlevel 3 在 /etc/rc.d/rc3.d/
+l4:4:wait:/etc/rc.d/rc 4    #<==runlevel 4 在 /etc/rc.d/rc4.d/
+l5:5:wait:/etc/rc.d/rc 5    #<==runlevel 5 在 /etc/rc.d/rc5.d/
+l6:6:wait:/etc/rc.d/rc 6    #<==runlevel 6 在 /etc/rc.d/rc6.d/
+
+# 是否允许按下 [ctrl]+[alt]+[del] 就重新启动的配置项目：
+ca::ctrlaltdel:/sbin/shutdown -t3 -r now
+
+# 底下两个配置则是关於不断电系统的 (UPS)，一个是没电力时的关机，一个是复电的处理
+pf::powerfail:/sbin/shutdown -f -h +2 "Power Failure; System Shutting Down"
+pr:12345:powerokwait:/sbin/shutdown -c "Power Restored; Shutdown Cancelled"
+
+1:2345:respawn:/sbin/mingetty tty1  #<==其实 tty1~tty6 是由底下这六行决定的。
+2:2345:respawn:/sbin/mingetty tty2
+3:2345:respawn:/sbin/mingetty tty3
+4:2345:respawn:/sbin/mingetty tty4
+5:2345:respawn:/sbin/mingetty tty5
+6:2345:respawn:/sbin/mingetty tty6
+
+x:5:respawn:/etc/X11/prefdm -nodaemon #<==X window 则是这行决定的！
+```
+
+`[配置项目]:[run level]:[init 的动作行为]:[命令项目]`  
+配置项目 最多四个字节; runlevel在哪个runlevel启动; init动作项目 initdefault默认的启动level,sysinit系统初始化动作,ctrlaltdel这三个键是否可以重新启动,wait后面的命令运行完才能继续向下,respawn后边的命令可以无限重启; 命令项目 通常是script  
+
+init处理流程  
+
+1. 取得默认等级
+1. 使用/etc/rc.d/rc.sysinit进行出初始化
+1. 由于默认level5所以只进行l5:5:wait:/etc/rc.d/rc 5,其他滤过
+1. 配置ctrl alt del功能
+1. 配置不断电系统pf pr机制
+1. 启动mingetty六个终端
+1. 最终以/etc/X11/perfdm -nodaemon启动图形界面
+
+系统初始化流程  /etc/rc.d/rc.sysinit  
+在inittab中配置, 利用rc.sysinit进行初始化环境配置  
+取得网络环境与主机类型, 测试挂载内存/proc与U盘/sys, 决定是否启动SELinux, 启动系统的随机数, 配置终端机字形, 配置启动过程中的欢迎画面; 配置系统时间; 周边设备的侦测与PnP参数测试, 使用者自定义的模块加载 /etc/sysconfig/modules/*.modules自定义的模块, 加载核心的相关配置/etc/sysctl.conf中的配置, 配置主机名称与初始化电源管理模块, 初始化软件磁盘阵列, 初始化LVM文件系统, 以fsck检验文件系统, 进行磁盘配额quota的转换, 重新以可读写模式挂载系统分区, 启动quota功能, 启动随机数产生器, 清除缓存文件, 将启动的信息存入/var/log/dmesg文件中  
+可以用dmesg进行查看  
+
+启动系统服务与相关配置文件  (/etc/rc.d/rc N & /etc/sysconfig)  
+
+可通过查看/etc/rc.d/rc文件看此shell脚本的功能  
+
+- 通过第一个参数取得要运行的脚本目录, 如/etc/rc.d/rc 5 可以取得/etc/rc5.d/这个目录来准备处理相关的脚本程序  
+- 找到/etc/rc5.d/K??*开头的文件,并进行/etc/rc5.d/K??* stop动作  
+- 找到/etc/rc5.d/S??*开头的文件,并进行/etc/rc5.d/S??* start动作
+
+/etc/rc5.d/中的文件都是以S??和K??开头的,全部是链接文件,链接到/etc/init.d/目录中 如/etc/rc5.d/K91capi stop --> /etc/init.d/capi stop 其中chkconfig就是在负责处理这个连接文件, 之后的数字是运行的顺序, S99local即/etc/rc.d/rc.local这个文件  
+
+自定义启动程序 /etc/rc.d/rc.local, 将写好的shell script文件放入此文件中, 会自动运行  
+
+根据/etc/inittab配置 加载终端机或X-window界面  
+
+启动过程中主要的配置文件  
+/etc/modprobe.conf 自定义文件的地方 指定模块参数等  
+/etc/syscofnig/*服务的相关配置文件在此目录 authconfig身份认证,加密算法; clock系统时间; i18n语系配置; keyboard&mouse键盘鼠标配置; network 网络主机名GATEWAY  配置; network-scripts/主要配置网卡; 启动过程中经常读取  
+
+Run Level的切换  
+runlevel获取当前level, init 3 切换为level3, 主要就是比对/etc/rc3.d/ 与/etc/rc5.d中K和S文件的不同,多的K文件关闭,多的S文件予以启动  
+
+核心与核心模块  
+核心:/boot/vmlinuz 或者 /boot/vmlinuz-version  
+核心解压所需RAM Disk 是/boot/initrd(initrd-version)  
+核心模块:/lib/modules/version/kernel 或 /lib/modules/$(uname -r)/kernel  
+核心原始码:/usr/src/linux或/usr/src/kernels/ 默认没有  
+
+核心顺利的加载后,会在/proc/version记录版本,/proc/sys/kernel记录核心功能  
+
+新的硬件系统不支持如何办? 可以重新编译核心,加入新的驱动程序. 或者将驱动程序编译成模块,启动时加载该模块  
+
+核心模块相关性  
+核心模块主要在/lib/mdules/$(uname -r)/kernel中, 主要有几个目录 arch硬件平台相关如cpu,crypto加密技术, drivers硬件驱动程序如显卡网卡PCI硬件等, fs系统支持的filesystems, lib函数库, net网络相关协议还有防火墙, sound音效相关模块  
+
+系统通过检查/lib/modules/$(uname -r)/modules.dep这个文件,记录了相关性  
+
+depmod 命令查看  模块依赖关系  
+depmod [-Ane] 参数-A 之后不加参数侦测目前核心模块写入/lib/modules/$(uname -r)/modules.dep中, -A加参数搜寻比modules.dep还新的模块, 找到新模块, 才会升级; -n不写入modules.dep直接输入到荧幕; -e显示出已加载不可运行的模块名称  
+
+核心模块的观察  
+lsmod  
+会显示模块名称,模块大小,模块是否被其他模块所使用  
+
+modinfo [-adln] [module_name|filename] 查看模块信息 参数-a仅列出作者名 -d列出说明 -l列出授权 -n列出路径  
+
+核心模块的加载与移除  
+insmod [/full/path/module_name] [parameters] 加载  
+如 insmod /lib/modules/$(uname -r)/kernel/fs/cifs/cifs.ko 可通过lsmod | grep cifs进行查看  
+
+rmmod [-fw] module_name 移除 参数 -f强制移除 -w若被使用,等待使用完毕后移除  
+
+modprobe [-lcfr] module_name 可侦测依赖关系 参数 -c列出所有模块 -l列出完整文件名 -f强制加载 -r移除  
+
+核心模块的额外配置参数 /etc/modprobe.conf 配置模块与选项  
+
+boot laoder grub  
+由于MBR仅有446bytes而已, grub分为两个阶段: stage1 运行bootloader主程序, 没有配置文件; stage2加载配置文件,主要配置文件menu.lst, 一般来说都在/boot底下  
+
+/boot/grub文件加下的文件  
+
+```shell
+ls -l /boot/grub
+-rw-r--r--  device.map              #<==grub 的装置对应档(底下会谈到)
+-rw-r--r--  e2fs_stage1_5           #<==ext2/ext3 文件系统之定义档
+-rw-r--r--  fat_stage1_5            #<==FAT 文件系统之定义档
+-rw-r--r--  ffs_stage1_5            #<==FFS 文件系统之定义档
+-rw-------  grub.conf               #<==grub 在 Red Hat 的配置档
+-rw-r--r--  iso9660_stage1_5        #<==光驱文件系统定义档
+-rw-r--r--  jfs_stage1_5            #<==jfs 文件系统定义档
+lrwxrwxrwx  menu.lst -> ./grub.conf #<==其实 menu.lst 才是配置档！
+-rw-r--r--  minix_stage1_5          #<==minix 文件系统定义档
+-rw-r--r--  reiserfs_stage1_5       #<==reiserfs 文件系统定义档
+-rw-r--r--  splash.xpm.gz           #<==启动时在 grub 底下的背景图示
+-rw-r--r--  stage1                  #<==stage 1 的相关说明
+-rw-r--r--  stage2                  #<==stage 2 的相关说明
+-rw-r--r--  ufs2_stage1_5           #<==UFS 的文件系统定义档
+-rw-r--r--  vstafs_stage1_5         #<==vstafs 文件系统定义档
+-rw-r--r--  xfs_stage1_5            #<==xfs 文件系统定义档
+```
+
+grub优点认识与支持加多的文件系统, 并且可以使用grub的主程序直接在文件系统中搜寻核心文件; 启动时候自行编辑修改配置项目; 动态搜寻配置文件,不需要修改后重新安装grub  
+硬盘与分区在grub中的代号(hd0,0),以()包起来,hd为硬盘,第一个数字以搜索顺序作为硬盘编号,第二个数字为分区顺序 如第一个硬盘为(hd0), 第二颗硬盘的第二个分区为(hd1,1),其中侦测顺序在bios中指定  
+
+/boot/grub/menu.lst与菜单类型  
+
+```shell
+vim /boot/grub/menu.lst
+default=0     #<==默认启动选项，使用第 1 个启动菜单 (title)
+timeout=5     #<==若 5 秒内未动键盘，使用默认菜单启动
+splashimage=(hd0,0)/grub/splash.xpm.gz #<==背景图示所在的文件
+hiddenmenu    #<==读秒期间是否显示出完整的菜单画面(默认隐藏)
+title CentOS (2.6.18-92.el5)    #<==第一个菜单的内容
+        root (hd0,0)
+        kernel /vmlinuz-2.6.18-92.el5 ro root=LABEL=/1 rhgb quiet
+        initrd /initrd-2.6.18-92.el5.img
+```
+
+title后的配置
+root (hd0,0)代表核心文件放在哪个partition中,不是根目录  
+kernel后面跟的是kernel的核心文件名 root=LABEL=/1 linux目录在那个partition中, 相当于挂载, rhgb彩色模式, quiet安静模式不会输出核心侦测信息  
+initrd initrd制作出的RAM Disk文件名  
+
+/boot独立分割  /dev/sda1 (/boot), /dev/sda5 (/) 写法 kernel (hd0,0)/vmlinuz root=/dev/sda5 ...  
+/boot无独立分割 dev/hda1 (/), /dev/hda2 (swap) 写法 kernel (hd0,0)/boot/vmlinuz root=/dev/hda1 ...  
+
+利用chain loader转交控制权   chainloader +1
+
+```shell
+vi /boot/grub/menu.lst
+#....前略....
+title Windows partition
+    hide (hd0,4)           #<==隐藏 (hd0,4) 这个分割槽, 不想让windows识别
+    rootnoverify (hd0,0)   #<==不检验此分割槽
+    chainloader +1         #<== +1 可以想成第一个磁区，亦即是 boot sector
+    makeactive             #<==配置此分割槽为启动碟(active)
+```
+
+initrd的重要性  
+需要initrd的时刻  根目录硬盘为SATA/U盘/SCSI接口, 根目录为LVM或RAID等特殊格式, 根目录为非linux认识的文件系统, 必须要在核心加载时提供的模块  
+如果要重制initrd文件,可以使用mkinitrd处理  
+mkinitrd [-v] [--with=模块名称] initrd文件名 核心版本 参数 -v显示过程 --with=模块名称,不需要写完整文件名 initrd文件名 核心版本  
+mkinitrd -v initrd_$(uname -r) $(uname -r) 创建一个initrd虚拟文件  
+mkinitrd -v --with=8139too initrd_vbirdtest $(uname -r) 将8139too模块加入initrd文件  
+
+测试与安装grub  
+如果默认是grub就不需要安装, 如果原来不是grub就需要安装  
+grub-install [--root-directory=DIR] INSTALL_DEVICE 参数 --root-directory=DIR 默认将grub文件复制到/boot/grub/*中,这样可以指定  INSTALL_DEVICE安装的装置代号  
+grub-install /dev/hda  
+grub-install --root-directory=/home /dev/hda3 将grub安装到/home所在的/dev/hda3中  /home/boot/grub文件夹中会有相应的内容  
+
+grub-install只处理配置文件,如果想安装grub到MBR与boot sector中,使用grub shell  
+grub进入grub shell  
+root(hdx,y) 选择进入含有grub目录的那个partition  
+find /boot/grub/stage1 看看能否找到安装资讯文件  
+find /boot/vmlinuz看看能否找到kernel file  
+setup (hdx,y)或者setup (hdx)将grub安装在boot sector或MBR中  
+quit退出grub shell  
+
+如果是从其他boot loader转成grub时, 先使用grub-install安装grub配置文件, 编辑menu.lst配置文件, 通过grub将主程序安装到系统中, 如MBR(hd0), boot sector(hd0,0)等等  
+
+启动过程中的功能修改  
+e是编辑, o新增一行, d删除行 仅当前页有效  
+e编辑完后,enter确认,boot启动, 如果menu.lst配置错误,可以进入grub shell进行配置, 如果grub都无法启动, 利用具有grub的CD来启动  
+
+menu.lst配置vga参数是分辨率的意思  
+BIOS无法读取大硬盘问题, 把核心文件放在前1024磁柱内, 可以通过创建/boot单独分区解决  
+个别菜单加口令  通过grub-md5-crypt进行获取口令  
+
+```shell
+vim /boot/grub/menu.lst
+....(前面省略)....
+title CentOS (2.6.18-92.el5)
+        password --md5 $1$kvlI0/$byrbNgkt/.REKPQdfg287.
+        root (hd0,0)
+        kernel /vmlinuz-2.6.18-92.el5 ro root=LABEL=/1 rhgb quiet vga=790
+        initrd /initrd-2.6.18-92.el5.img
+....(中间省略)....
+title single user mode
+        password --md5 $1$GFnI0/$UuiZc/7snugLtVN4J/WyM/
+        root (hd0,0)
+        kernel /vmlinuz-2.6.18-92.el5 ro root=LABEL=/1 rhgb quiet single
+        initrd /initrd-2.6.18-92.el5.img
+```
+
+输入口令才可进入, 但这样可以通过e编辑,进行修改
+
+```shell
+vim /boot/grub/menu.lst
+default=0
+timeout=30
+password --md5 $1$kvlI0/$byrbNgkt/.REKPQdfg287.  <==放在整体配置处
+splashimage=(hd0,0)/grub/splash.xpm.gz
+#hiddenmenu
+title CentOS (2.6.18-92.el5)
+        lock  <==多了锁死的功能
+        root (hd0,0)
+        kernel /vmlinuz-2.6.18-92.el5 ro root=LABEL=/1 rhgb quiet vga=790
+        initrd /initrd-2.6.18-92.el5.img
+```
+
+这样整体加口令,lock之后修改也需要口令  
+
+启动过程中的问题解决  
+忘记root密码 在grub中编辑, 最后加入single, 进入单人维护模式, 进行修改root密码  
+init配置错误  
+即使进入single模式也会读取inittab,如果inittab配置错误,也无法进入, 可通过修改 init=/bin/bash 进入bash 仅会加载根目录,且为只读模式, mount -o remount,rw / 重新挂载/目录,mount -a,挂载/etc/fstab配置的文件系统, 修改/etc/inittab 然后重启  
+硬盘对应的device.map, 通过在/boot/grub/device.map中指定,避免BIOS中的配置导致的问题  
+利用chroot切换到另一颗硬盘工作  
+
+## 系统配置工具
+
+CentOS配置工具setup  
+可以配置Authentication configuration身份认证, Firewall configuration防火墙, Keyboard configuration键盘, Network configuration网络配置, System services系统服务,Timezone configuration市区服务, X configuration配置Xwindow  
+
+## 软件源码安装
+
+Linux上的软件几乎都是经过GPL授权的, 所以每个软件几乎都会提供程序的原始码.  
+Linux系统真正认识的可运行程序其实是二进制文件,如/usr/bin/passwd,/bin/touch. 像shell scripts其实是利用shell程序进行一些功能判断, 最终运行的仍是二进制程序. 可以通过file命令查看可运行程序的类型, 如果是shell脚本是通过最上方的#!/bin/bash指定的, 否则会显示ASCII文字文件.  
+函式库：就类似副程序的角色，可以被呼叫来运行的一段功能函数  
+make命令搜索目录下的makefile/Makefile文件, 通过其配置, 自动升级安装运行文件. 通常软件开发商会写一直侦测程序来侦测使用者的环境, 测试完成后会创建Makefile文件, 通常测试文件为configure/config  
+侦测文件一般会侦测是否有时候的编译器, 是否存在本软件所需要的函数库, 操作系统平台是否适合本软件, 核心表头定义文件是否存在.  
+一般需要configure, 创建makefile, 然后运行make命令安装  
+一般软件会打包成tarball, 而且会以gzip或者bzip2格式, 后缀为*.tar.gz或者*.tar.bz2, 里边通常有原始程序, 侦测文件, 简易安装说明 install或者readme  
+软件升级原因 需要新功能, 就软件有安全漏洞, 就软件性能不足  
+软件升级方法 直接原始码编译安装升级, 以编译好的binary program安装升级  
+
+tarball软件安装流程 下载,解压,gcc编译,gcc链接形成binary file, 将binaryfile安装在主机上. 其中编译过程可以通过make命令简化. 所以系统上需要安装gcc和make  
+
+```c
+vim hello.c
+#include<stdio.h>
+int main(void)
+{
+    printf("Hello World!\n");
+}
+```
+
+gcc hello.c进行编译产生a.out运行文件  
+gcc -c hello.c 产生hello.o链接文件  
+gcc -o hello hello.o 产生hello运行文件  
+./hello运行  
+gcc -O hello.c -c产生hello.o文件,并进行优化  
+gcc sin.c -lm -L/usr/lib -I/usr/include  -lm指的是libm.so或者libm.a函数库文件, -L上面的函数库的搜索目录, -I后面的原始码include文件所在目录  
+gcc -o hello hello.c -Wall 加入-Wall后程序编译的会严谨, 同时显示警告信息  
+
+make命令  
+vim makefile  
+main: main.o haha.o sin_value.o cos_value.o
+    gcc -o main main.o haha.o sin_value.o cos_value.o -lm
+make  
+make命令和shell scripts 不一样, make会判断每个目标文件的原始文件, 然后直接予以编辑, 最后进行连接, 同时可以判断哪一个文件的原始码与相关的目标文件是否升级过, 并仅升级新文件. 省去大量的编译时间  
+
+make语法  
+标的(target): 目标档1 目标档2
+\<tab\>   gcc -o 欲创建的运行档 目标档1 目标档2
+其中注释为#, target与目标文件用:隔开
+
+```shell
+vi makefile
+main: main.o haha.o sin_value.o cos_value.o
+    gcc -o main main.o haha.o sin_value.o cos_value.o -lm
+clean:
+    rm -f main main.o haha.o sin_value.o cos_value.o
+```
+
+这样可以运行 make clean命令 或 make clean main命令  
+同时可以用变量简化makefile  
+
+```shell
+LIBS = -lm
+OBJS = main.o haha.o sin_value.o cos_value.o
+main: ${OBJS}
+        gcc -o main ${OBJS} ${LIBS}
+clean:
+        rm -f main ${OBJS}
+```
+
+与shell script语法不同, 变量与内容以=分隔, 两遍可同时有空格, 变量左边不可以是tab, 不可以有:, 变量以大写字母为主, 取值$(变量)或${变量}, 可以与shell变量套用,如CFLAGES, 命令列模式可以直接给予变量  
+CFLAGS="-Wall" make clean main 进行编译时会取用CFLAGS的变量内容  
+以make命令行后边加上的环境变量为主, makefile指定的环境变量第二, shell原本的环境变量第三  
+$@代表标的target  
+
+tarball的安装是跨平台的, 可以用C语言写程序  
+gcc编译器, amke及auoconfig软件, kernel提供的library  
+
+tarball安装步骤  
+下载原始文件, 在/usr/local/src目录解压; 查看install readme文件; 依据install/readme文件中的提示, 安装依赖软件; 运行configure创建makefile 文件; 运行make命令编译; 安装, 运行make命令, 取得配置文件安装.  
+make最常见的target是install 与 clean  
+命令步骤 ./configure ; make clean; make; make install  
+
+自行安装的软件建议安装在/usr/local/文件夹中. 默认情况下man回去寻找/usr/local/man文件夹里的说明文件.  
+例子, 安装ntp  
+
+```shell
+cd /usr/local/src
+tar -zxvf /root/ntp-4.2.4p7.tar.gz #解压到此目录
+cd ntp-4.2.4p7/
+vi INSTALL #查看安装方法
+./configure --help | more #查询可用的参数
+./configure --prefix=/usr/local/ntp --enable-all-clocks --enable-parse-clocks #开始创建makefile  
+make clean; make
+make check
+make install
+```
+
+patch -p数字 < patch_file 进行升级
+
+函数库管理  
+静态函数库扩展名.a, 编译行为整合到运行文件中, 独立运行程序, 升级比较麻烦  
+动态函数库扩展名.so, 编译行为是指针, 未整合到运行文件, 不能独立运行, 升级简单  
+目前比较倾向于动态函数库, 升级方便, 而且文件小  
+
+动态函数库 增加读写速度, 将函数库加载到内存中的缓存中, 下次使用就不用再次读取了  ldconfig /etc/ld.so.conf的协助  
+ldconfig [-f conf] [ -C cache]
+ldconfig [-p] 参数 -f指定conf路径, -C使用cache为缓存函数库数据 -p列出目前所有的函数库数据内容  
+vim /etc/ld.so.conf 增加/usr/lib/mysql一行  
+ldconfig
+ldconfig -p列出不浅函数库的内容  
+利用ldd查看二进制文件需要的函数库  
+ldd [-vdr] [filename] 参数-v列出内容 -d遗失的link显示出来, -r将ELF错误内容显示出来  
+如ldd /usr/bin/passwd  
+检验软件正确性  
+md5sum/sha1sum [-bct] filename 参数-b使用binary读档方式 -c检验文件指纹 -t文字形态读档方式  
+md5sum/sha1sum [--status|--warn] --check filename  
+
+## 软件RPM安装
+
+tarball安装方式很麻烦, 所以厂商为了方便安装, 提供了两种简便的安装方式  
+rpm与dpkg  会有软件依赖性问题, 为了解决此问题, 通过线上安装方式解决 dpkg的apt-get机制, rpm的yum机制,you,urpmi等等  
+
+rpm RedHat Package Manager之前是redhat开发出来的, 以数据库记录方式将所需的软件安装到linux系统. 预先编译过, 先查询是否满足依赖性, 满足则安装并记录数据库中, 不满足则不安装  
+SRPM source rpm里边含有原始码, 并没有编译过, 但其中记录的依赖信息, 命名方式*.src.rpm 安装方式:编译成rpm,然后安装. srpm与tarball不同的是记录可依赖信息, 可编译为rpm包  
+XXXXXX.rpm rpm包名 XXXX.src.rpm srpm包名  
+rp-pppoe-3.1-5.i386.rpm 其中 rp-pppoe为软件名 3.1为软件版本 5为释出次数 i386 硬件平台 rpm扩展名  
+平台有 i386 i586 i686 x86_64 noarch与平台没有关系,一般是shell script  
+rpm优点 已编译; 检查硬盘容量系统版本等信息, 避免安装错误; 方便了解软件; 便于查询升级移除验证等  
+
+rpm默认安装路径  
+/etc/ 放置配置文档 ; /usr/bin运行文件 ; /usr/lib动态函数库; /usr/share/doc软件使用手册; /usr/share/man存放man page  
+rpm -ivh package_name 参数 -i install -v查看信息 -h显示安装进度  
+其他参数 --nodeps不检查依赖关系 --replacefiles覆盖文件 --replacepkgs 批量安装时使用; --force 是--replacefiles和--replacepkgs的综合体; --test 测试是否可安装; --justdb 升级数据库; --nosignature略过签名检查 --prefix新安装路径 --noscripts 不想安装过程中运行系统命令,如初始化动作  
+rpm升级 -Uvh没安装直接安装,安装过直接升级 -Fvh安装过的才会升级  
+rpm -qa 查询所有 模糊查询可通过 grep 过滤  
+rpm -q[licdR] 已安装的软件名称  
+rpm -qf 存在於系统上面的某个档名  
+rpm -qp[licdR] 未安装的某个文件名称  
+参数 -q仅查询 -qa查询所有 -qi查询信息 -ql列出完整文件名 -qc查找配置文件 -qd查看说明文件 -qR所有依赖文件 -qf该文件属于那一个软件 -qp查询某个rpm文件内的信息  
+
+rpm验证与签名  
+rpm -Va  
+rpm -V  已安装的软件名称  
+rpm -Vp 某个 RPM 文件的档名  
+rpm -Vf 在系统上面的某个文件  
+参数 -V软件变动过才列出来 -Va所有可能被变动过的文件 -Vp列出软件内被变动过的文件  -Vf某个文件是否改变过  
+rpm -V logrotate 结果是..5....T  c /etc/logrotate.conf  
+其中参数意思是S容量大小是否改变; M文件属性是否改变; 5指纹是否改变; D主次版本; L link路径; U所属人; G所属群组; T创建时间  
+文件类型 c配置文件; d文件数据; g鬼文件,不应该被软件包含; l授权文件; r读我文件  
+数字签名 digital signature, 只能验证/var/lib/rpm中的数据库, 如果本身有问题,那就验证不了  
+先安装原厂公钥,安装原厂的rpm,会读取rpm的数字签名, 相同则安装, 找不到则警告  
+rpm --import /etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-5 ,导入公钥  
+
+rpm卸载  
+通过 -e命令即可, 要从上往下移除 rpm --rebuilddb重建数据库  
+
+srpm使用
+rpmbuild编译源码, 并安装  
+--rebuild 编译打包  
+--recompile 编译打包并安装  
+SRPM 路径  
+/usr/src/redhat/SPECS 配置文件,参数  
+/usr/src/redhat/SOURCES 原始文件  
+/usr/src/redhat/BUILD 编译缓存文件  
+/usr/src/redhat/RPMS 成功编译好的文件  
+/usr/src/redhat/SRPMS SRPM封装的文件  
+
+YUM线上升级机制  
+yum [option] [查询工作项目] [相关参数] 参数 -y自动输入yes --installroot=/some/path指定安装目录 search查询名称和描述中的关键字 list查询所有 info查询信息 provides 查询文件名  install 安装 remove 卸载  
+配置文件  
+/etc/yum.repos.d/CentOS-Base.repo 文件  
+
+```shell
+[base]
+name=CentOS-$releasever - Base
+mirrorlist=http://mirrorlist.centos.org/?release=$releasever&arch=$basearch&repo=os
+#baseurl=http://mirror.centos.org/centos/$releasever/os/$basearch/
+gpgcheck=1
+gpgkey=http://mirror.centos.org/centos/RPM-GPG-KEY-CentOS-5
+```
+
+[base]容器, name说明, mirrorlist镜像地址, baseurl实际网址, mirrorlist是自行捕捉url地址, enable=1 被启动,不启动enable=0 , gpgcheck=1 是否查询签名, gpgkey 签名所在位置  
+
+yum repolist all 查询所有yum源  
+yum clean [packages|headers|all] 参数 packages删除已下载软件 headers删除文件头 all所有数据删除  
+yum [群组功能] [软件群组] 参数grouplist groupinfo groupinstall groupremove  
+
+## X window配置
+
+GUI 图形界面 graphical user interface  
+CLI 命令行界面 command line interface  
+
+- 在 Unix Like 上面的图形使用者介面 (GUI) 被称为 X 或 X11
+- X11 是一个『软件』而不是一个操作系统
+- X11 是利用网络架构来进行图形介面的运行与绘制
+- 较著名的 X 版本为 X11R6 这一版，目前大部分的 X 都是这一版演化出来的 (包括 X11R7)
+- 现在大部分的 distribution 使用的 X 都是由 Xorg 基金会所提供的 X11 软件
+- X11 使用的是 MIT 授权，为类似 GPL 的自由软件授权方式
+
+主要组件  
+X Server/X Client/Window Manager/Display Manager  
+X Server管理用户端的硬件, 包括接受键盘/鼠标等设备的输入, 将图形绘制在萤幕上, 同时提供字体功能  
+X Client 针对输入装置的行为进行处理,通过远程服务告知X Server显示什么  
+举例 移动鼠标. Xserver侦测鼠标的移动, 然后告知Xclient, Xclient运算, 得到结果移动几个像素, 然后告知Xserver绘制  
+X Window Manager特殊的X Client 负责处理所有的X Client软件, 解决XClient不知道彼此之间产生的问题, 同时提供控制元素,管理壁纸,控制窗口大小  
+Display Manager 提供登录需求, 负责加载Window Manager提供语言环境等  
+X Window启动流程  
+在文字界面启动 通过startx启动, 其实startx 是一个shell script会主动帮助使用者建立起X所需要的配置文件, 找出默认的Xserver 与 Xclient的配置文件, 格式如下 startx [X client 参数] -- [X server 参数] 参数通过--分割 如 startx -- -depth 16让xserver以16bit色彩深度启动X  
+startx Xserver的参数顺序 优先使用startx命令参数, 如果没有则使用~./xserverrc文件参数,如果没有则使用/etc/X11/xinit/xserverrc文件, 如果也没有则单纯运行/usr/bin/X程序其配置文件是/etc/X11/xorg.conf  
+Xclient参数顺序 使用startx参数, 没有则使用~/.xinitrc, 没有则使用/etc/X11/xinit/xinitrc文件, 如果没有则运行xterm程序  
+
+startx是通过xinit启动才X Window  
+xinit [client option] -- [server or display option] 如果家目录没有配置,输入startx 相当于 xinit /etc/X11/xinit/xinitrc -- /etc/X11/xinit/xserverrc 如果xserverrc不存在, 相当于xinit /etc/X11/xinit/xinitrc -- /usr/bin/X  
+xinit默认参数是xinit xterm -geometry +1+1 -n login -display :0 -- X :0  
+xterm是X窗口下的默认虚拟终端机,
+
+单独启动  
+X :1& 在1号启动Xserver, 默认1号是tty8  
+xterm -display :1 & 启动Xclient并在1号显示  
+xclock -display :1  &  
+xeyes -display :1  &  
+twm -display :1 & 启动twm窗口管理程序  
+
+若有多个登录环境 可修改/etc/sysconfig/desktop中文件修改默认登录环境  
+
+## Linux备份策略
+
+推荐备份的数据
+
+- /boot
+- /etc
+- /home
+- /root
+- /usr/local(或者是 /opt 及 /srv 等)
+- /var(注：这个目录当中有些缓存目录则可以不备份！)
+
+不需要配置的数据  
+
+- /dev ：这个随便你要不要备份  
+- /proc：这个真的不需要备份啦！  
+- /mnt 与 /media：如果你没有在这个目录内放置你自己系统的东西，也不需要备份  
+- /tmp ：干嘛存缓存档！不需要备份！  
+
+## 核心编译与管理
 
 ## maven仓库镜像
 
