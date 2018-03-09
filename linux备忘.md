@@ -82,6 +82,8 @@
     - [X window配置](#x-window%E9%85%8D%E7%BD%AE)
     - [Linux备份策略](#linux%E5%A4%87%E4%BB%BD%E7%AD%96%E7%95%A5)
     - [核心编译与管理](#%E6%A0%B8%E5%BF%83%E7%BC%96%E8%AF%91%E4%B8%8E%E7%AE%A1%E7%90%86)
+    - [CentOS7区别](#centos7%E5%8C%BA%E5%88%AB)
+    - [网络](#%E7%BD%91%E7%BB%9C)
     - [maven仓库镜像](#maven%E4%BB%93%E5%BA%93%E9%95%9C%E5%83%8F)
     - [常用缩写](#%E5%B8%B8%E7%94%A8%E7%BC%A9%E5%86%99)
         - [1. 目录缩写](#1-%E7%9B%AE%E5%BD%95%E7%BC%A9%E5%86%99)
@@ -1271,6 +1273,8 @@ account    include      system-auth
 password   include      system-auth
 验证类别   控制标准     PAM 模块与该模块的参数
 ```
+
+密码输入错误的时候反应慢, 是因为pam_unix.so模块防止暴力破解的方式, 可通过man pam_unix查看, 可以修改/etc/pam.d/system-auth 中密码认证阶段auth的pam_unix.so的参数中添加nodelay  
 
 第一个字段验证类别 有auth认证 account授权 session会话 password口令修改变更  
 有顺序,因为先验证身份,然后授权,配置环境信息,才可修改密码.
@@ -2761,6 +2765,39 @@ twm -display :1 & 启动twm窗口管理程序
 - /tmp ：干嘛存缓存档！不需要备份！  
 
 ## 核心编译与管理
+
+## CentOS7区别  
+
+默认的文件系统进行了修改, 改为了XFS格式, 不再是EXT4格式.  
+近代硬盘的分区模式也进行了修改, 不在使用MBR, 而是使用GPT模式, 但小硬盘分区依然是MBR模式, 可通过安装时进行修改, 安装时按tab键, 修改核心参数, 最后加入inst.gpt进行修改  
+引导程序进行了修改, 改为了grub2, 不再是grub  
+系统初始化技术行不行了修改, 不再用之前的sysvinit, 进行管理, 而统一用systemd进行管理  
+主要区别  
+内核进行了修改由2.6升级到3.10  
+防火墙由iptables改为firewalld  
+默认数据库由mysql改为mariadb  
+文件结构 /bin, /sbin, /lib, /lib64 移动到了/usr下  
+主机名/etc/sysconfig/network 改为了/etc/hostname  
+时间同步由ntp/ntpq -p 改为了 chrony/chronyc sources  
+
+sysvinit技术特点是:系统第一个进程为init, init不可kill, 大多数linux的init系统是和systemv兼容的, 被称为sysvinit. 优点是运行良好,概念清晰,主要依赖于shell脚本. 缺点是按照顺序执行, 启动慢, 容易hang住, 如fstab与nfs挂载问题  
+upstart技术 upstart在rc.sysinit脚本上做了大量的优化, 缩短了系统的启动时间  
+systemtd技术 克服了sysvinit缺点提高了启动速度, 与sysvinit兼容, 降低迁移成本, 并行启动  
+yum源进行了优化, 之前默认是从官方下载rpm包, 国内太慢, 下载是里地理位置最近的yum源进行下载  
+最小安装时未安装vim/inconfig/route/setup/nestat命令, 可通过以下yum命令安装 `yum install lrzsz tree net-tools nmap vim bash-completion lsof dos2unix nc telnet ntp wget rng-tools psmisc screen -y`  
+字符集修改 修改/etc/locale.conf文件, localectrl set-local LANG=zh_CN.UTF-8 , 通过localectl status 进行查看  
+开机启动管理  
+/etc/rc.local还是存在可加运行权限执行, systemd 管理方式 systemctl [command] [servicename] 如systemctl status cron.service查看任务状态  start/stop/list-unit-files/disable/is-enable  
+/etc/inittab是无效的被system target替代  
+永久生效下次登录生效  
+systemctl get-default graphical.target 切换到5  
+systemctl get-default multi-user.target 切换到3  
+临时生效 init 3  
+`ls -lh /usr/lib/systemd/system/runlevel*.target`可查看运行级别  
+
+## 网络
+
+tcpdump命令查询的ack会有偏移, 以第一次的为准, 可加-S取消  
 
 ## maven仓库镜像
 
