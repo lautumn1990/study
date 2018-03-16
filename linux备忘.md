@@ -84,6 +84,7 @@
     - [核心编译与管理](#%E6%A0%B8%E5%BF%83%E7%BC%96%E8%AF%91%E4%B8%8E%E7%AE%A1%E7%90%86)
     - [CentOS7区别](#centos7%E5%8C%BA%E5%88%AB)
     - [网络](#%E7%BD%91%E7%BB%9C)
+    - [网络常用命令](#%E7%BD%91%E7%BB%9C%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4)
     - [maven仓库镜像](#maven%E4%BB%93%E5%BA%93%E9%95%9C%E5%83%8F)
     - [常用缩写](#%E5%B8%B8%E7%94%A8%E7%BC%A9%E5%86%99)
         - [1. 目录缩写](#1-%E7%9B%AE%E5%BD%95%E7%BC%A9%E5%86%99)
@@ -2798,6 +2799,154 @@ systemctl get-default multi-user.target 切换到3
 ## 网络
 
 tcpdump命令查询的ack会有偏移, 以第一次的为准, 可加-S取消  
+
+局域网(local area network LAN) 同一个单位内  
+广域网(wide area network WAN) 远距离传输  
+
+OSI七层模型  
+应用层 Application  
+表示层 Presentation  
+会话层 Session  
+传输层 Transport  
+网络层 Network  
+数据链路层 Data link  
+物理层 Physical  
+
+物理层 将数据以特定的形式发送出去, 如转变为电信号(电压高低)或光信号(光的闪灭)  设备有中继器(延长物理层, 放大信号, 集线器即是一种多口中继器) 协议?线路 无线电 光纤  
+数据链路层 无力层面的上的互联, 通过mac地址, 进行数据传送  设备网桥(即2层交换机, 连接链路层的两个网络设备, 能够识别数据帧, 储存处理重新生成转发, 交换集线器是一种网桥)  协议PPP SBTV SLIP 以太网 令牌环  
+网络层 通过ip地址进行传送  设备路由器(3层交换机, 处理ip地址, 可以连接不同数据链路)  协议IP ICMP  
+传输层 可靠传输, 只在双方节点上处理, 不在路由器处理  协议TCP UDP  
+会话层 负责简历断开通信连接, 数据分割的传送管理  Sockets  
+表示层 将引用层的内容转化为适合网络传输的格式  协议 SSL MIME  
+应用层 为应用程序服务并规定应用程序的通信细节  协议HTTP FTP TELNET SSH SMTP POP3 NFS  
+
+TCP/IP模型
+应用层 application  
+传输层 transport  
+网络互联层 internet  
+网络接口层 link  
+
+TCP/IP运作流程, 以打开google为例  
+
+1. 应用程序阶段 打开浏览器, 输入地址, 按下enter, 网址和相关数据会被包装成数据, 传给应用层  
+1. 应用层 有应用层提供的http通信协议, 将浏览器数据包起来, 形成应用层表头, 传送给传输层  
+1. 传输层  由于http为可靠联机, 将数据丢入TCP封包, 给予TCP表头, 丢向网络层  
+1. 网络层 将TCP封包进IP封包内, 给予IP表头, 丢向链路层  
+1. 链路层 包裹MAC frame中, 基于mac表头 生成校验码, 利用物理层传输到主机  
+1. google将数据一步步反向解开  
+
+IP地址组成与分级  
+classA ip开头是0 net8位 范围0-127
+classB ip开头是10 net 16位 范围128-191  
+classC ip开头110 net 24位 范围192-223
+classD ip开头1110 范围224-239 群播使用  
+classE ip开头1111 范围240-255 暂未启用  
+
+privateIP 在局域网内使用的ip地址  私有地址不能对外散播, 不能透过internet传送, 只限于内部使用  
+classA 10.0.0.0-10.255.255.255  
+classB 172.16.0.0-172.31.255.255  
+classC 192.168.0.0-192.168.255.255  
+
+loopback IP地址 127.0.0.0/8 默认localhost是127.0.0.1  
+
+ip取得可以通过手动设置, 拨号获得, 或者 DHCP获得  
+
+子网掩码 为了自由的对网络进行划分, 便于路由转发  
+192.168.0.0/26 等同于 192.168.0.0/255.255.255.192  
+表示192.168.0.0-192.168.0.63这一段网络, 其中192.168.0.0代表整段网络, 192.168.0.63代表广播地址  
+如果192.168.0.0-192.168.0.255子网掩码为26  即代表四段网络  
+192.168.0.0/26, 192.168.0.64/26, 192.168.0.128/26, 192.168.0.192/26  
+
+通过route 或者netstat -r查看路由状态  
+
+mac地址与ip的关系可以通过arp查看或者rarp反向查看 arp(address resolution protocol 网络地址解析协议) rarp(revers arp, 反向网络地址解析协议)  
+arp 参数 -n 数字形态 -d 删除 -s保存  
+
+ICMP (internet control message protocol 因特网信息控制协议), 主要是错误侦测与汇报, ping和traceroute命令即是使用此协议, 类别0是一个相应信息, 8是请求一个相应信息  
+
+tcp三次握手  同时防止网络延迟的问题, 因为网络是双向的, 各方都要保证自己的发送对方能够收到, 对方的自己能够收到, 第二次进行了发送与确认的合并, 所以只有三次  
+第一次 client 发送SYN包, 随机产生seq=x, 进入SYN-SENT状态, 等待server确认  
+第二次 server 将ACK与SYN都置为1, ack=x+1, 随机产生seq=y, 发送给client, 进入SYN-RCVD状态, 等待client确认, 系统分配TCP缓存和变量  
+第三次 client发送ACK置为1, ack=y+1, 都进入ESTABLISHED, 系统分配TCP缓存和变量  
+
+SYN攻击  服务器端的资源分配是在二次握手时分配的，而客户端的资源是在完成三次握手时分配的, server回复确认包, 等待client确认, server不断重发, 资源浪费. 解决方式降低主机等待时间, 短时间内收到某个ip的频繁请求, 主动丢弃  
+
+tcp四次挥手  因为数据有可能没有传完, 所以两次发送不能合并  
+第一次 client发送FIN包, 假设seq=u, 并停止发送数据, 进入FIN-WAIT-1状态, 等待server确认  
+第二次 server发送ACK包, 确认序号ack=u+1, seq=v包, server进入CLOSE-WAIT状态, client收到后进入FIN-WAIT-2状态  
+第三次 server没有要发送数据的时候, 发出FIN,ACK,seq=w,ack=u+1包, 进入LAST-ACK状态, 等待client确认  
+第四次 收到后发出ACK,seq=u+1,ack=w+1包进入TIME-WAIT状态, 此时TCP未释放, 等待2MSL进入CLOSED状态, 而server收到后进入CLOSED状态, 等待2MSL原因, 防止最后一个ACK丢失, B一直出于确认阶段, 重传的报文能够收到, 并重新发送  
+
+![tcp.png](image/TCP.png)
+
+## 网络常用命令
+
+ifconfig  
+ifconfig {interface} {up|down}
+ifconfig interface {options}
+参数 interface接口代号如eth0, eth1, ppp0 options选项有up,down mtu 设置mtu值 netmask子网掩码 broadcast广播地址  
+
+ifup ifdown 开启/关闭设备 相当于ifconfig eth0 up, 是一个脚本  
+
+route 路由查看与修改  
+route [-nee]
+route add [-net|-host] [网域或主机] netmask [mask] [gw|dev]
+route del [-net|-host] [网域或主机] netmask [mask] [gw|dev]
+参数 -n使用数字 -ee更详细信息  add增加del删除  
+ip  
+ip [option] [动作] [指令]
+参数 -s 显示统计数据 link关于装置的设定 ,addr/address额外的ip协议 , route路由相关设定  
+ip [-s] link show  
+ip link set [device] [动作与参数]
+接口设定 show显示 set参数 up|down打开关闭, address 更改mac地址, name修改装置的名字, mtu修改mtu值  
+ip address show  
+ip address [add|del] [IP参数] [dev 装置名] [相关参数]
+参数 show显示 add|del添加删除 相关参数有broadcast广播地址,label别名, scope主要有global,site,link,host  
+ip route show  
+ip route [add|del] [IP或网域] [via gateway] [dev 装置]
+参数show显示 add|del添加删除 ip或网域 via通过的网关 dev装置 mtu设定mtu  
+
+iwlist iwconfig 无线查看与设定  
+
+dhclinet
+自动获取ip地址, 后接装置名 如eth0  
+
+ping 网络是否正常  
+ping [选项与参数] IP  
+参数-c次数 -n数字显示 -s封包大小 -t生存时间TTL -W等待对方的秒数 -M探测MTU大小
+
+traceroute 分析经过的节点  
+traceroute [选项与参数] IP
+参数 -n数字显示 -U使用UDP的方式 -I使用ICMP方式 -T使用TCP方式 -w时间 -p端口号 -i装置 -g路由  
+
+netstat 查看网络状态  
+netstat -[rn]
+netstat -[antulpc]
+参数 -r路由相关 -n数字显示  -a所有联机状态 -t仅TCP -u仅UDP -l仅listen的端口 -p显示PID -c几秒更新一次  
+
+host 探测主机名与ip对应关系  
+host [-a] hostname [server]
+参数 -a显示详细设定 server可以使用非/etc/resolv.conf中预设的DNS服务器  
+
+nslookup 与host基本相同  
+nslookup [-query=[type]] [hostname|IP]
+参数-query=type 处理ip与主机名对应, 还有mx, cname等
+
+telnet [host|IP [port]]  
+ftp [host|IP] [port]  
+lftp  
+lftp [-p port] [-u user[,pass]] [host|IP]  
+lftp -f filename  
+lftp -c "commands"  
+参数 -p远程ftp端口 -u帐号密码 -f自动化文件 -c命令  
+links [options] [URL]  
+参数 -anonymous [0|1]：是否匿名 -dump [0|1]输出到standard out -dump_charset 设置编码  
+wget 文字下载器  
+tcpdump 获取tcp包数据  
+tcpdump [-AennqX] [-i 接口] [-w 储存档名] [-c 次数] [-r 档案] [所欲撷取的封包数据格式]  
+参数-A数据以ascii显示 -e以mac封包数据显示 -nn数字显示 -q简短封包 -X十六禁止对应ascii -i设备名 -w封包数据储存 -r存储的封包数据读入 -c封包次数  
+
+wireshark 图形化版的tcpdump, yum install wireshark wireshark-gnome 进行安装  
 
 ## maven仓库镜像
 
