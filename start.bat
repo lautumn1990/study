@@ -1,11 +1,15 @@
 @echo off   
 
-::call:programStart "idea.exe" "C:\Users\Administrator.2017.V.2.12-007\Desktop\桌面快捷方式\id.lnk"
-call:programStart "chrome.exe" "C:\Users\Administrator.2017.V.2.12-007\Desktop\桌面快捷方式\gc.lnk"
-::call:programStart "navicat.exe" "C:\Users\Administrator.2017.V.2.12-007\Desktop\桌面快捷方式\ms.lnk"
-call:programStart "Code.exe" "C:\Users\Administrator.2017.V.2.12-007\Desktop\桌面快捷方式\vs.lnk"
-call:programStart "vmware.exe" "C:\Users\Administrator.2017.V.2.12-007\Desktop\桌面快捷方式\vm.lnk"
-call:programStart "Xshell.exe" "C:\Users\Administrator.2017.V.2.12-007\Desktop\桌面快捷方式\xs.lnk"
+call:programStart "lync.exe" "C:\Users\lautumn1990\Desktop\桌面快捷方式\ly.lnk"
+call:programStart "Code.exe" "C:\Users\lautumn1990\Desktop\桌面快捷方式\vs.lnk"
+call:programStart "chrome.exe" "C:\Users\lautumn1990\Desktop\桌面快捷方式\gc.lnk"
+call:programStart "Toad.exe" "C:\Users\lautumn1990\Desktop\桌面快捷方式\rsa.lnk"
+call:programStart "idea.exe" "C:\Users\lautumn1990\Desktop\桌面快捷方式\id.lnk"
+REM call:programStart "navicat.exe" "C:\Users\lautumn1990\Desktop\桌面快捷方式\ms.lnk"
+REM call:programStart "vmware.exe" "C:\Users\lautumn1990\Desktop\桌面快捷方式\vm.lnk"
+REM call:programStart "Xshell.exe" "C:\Users\lautumn1990\Desktop\桌面快捷方式\xs.lnk"
+call:programStart "eclipse.exe" "C:\Users\lautumn1990\Desktop\桌面快捷方式\rsa.lnk"
+call:programStart "SogouExplorer.exe" "C:\Users\lautumn1990\Desktop\桌面快捷方式\sg.lnk"
 
 :: 不关闭当前cmd
 :: cmd.exe

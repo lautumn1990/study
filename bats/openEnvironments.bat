@@ -1,0 +1,2 @@
+rem 打开环境变量cmd
+rundll32 sysdm.cpl,EditEnvironmentVariables
