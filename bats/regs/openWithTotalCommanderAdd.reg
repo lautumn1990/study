@@ -1,0 +1,40 @@
+Windows Registry Editor Version 5.00
+
+;添加tc到右键同时设为默认, 添加用资源管理器打开, 设为备选菜单
+[HKEY_CLASSES_ROOT\Drive\shell]
+@="open"
+
+[HKEY_CLASSES_ROOT\Drive\shell\open]
+@="用TC打开"
+"Icon"="C:\\Users\\lautumn1990\\AppData\\Local\\TotalCMD64\\Totalcmd64.exe"
+
+[HKEY_CLASSES_ROOT\Drive\shell\open\command]
+@="C:\\Users\\lautumn1990\\AppData\\Local\\TotalCMD64\\Totalcmd64.exe /O \"%1\""
+
+[HKEY_CLASSES_ROOT\Drive\shell\openWithExplorer]
+"MultiSelectModel"="Document"
+"Icon"="%SystemRoot%\\System32\\shell32.dll,3"
+@="资源管理器打开 (&O)"
+
+[HKEY_CLASSES_ROOT\Drive\shell\openWithExplorer\command]
+@=""
+"DelegateExecute"="{11dbb47c-a525-400b-9e80-a54615a090c0}"
+
+[HKEY_CLASSES_ROOT\Directory\shell]
+@="open"
+
+[HKEY_CLASSES_ROOT\Directory\shell\open]
+@="用TC打开"
+"Icon"="C:\\Users\\lautumn1990\\AppData\\Local\\TotalCMD64\\Totalcmd64.exe"
+
+[HKEY_CLASSES_ROOT\Directory\shell\open\command]
+@="C:\\Users\\lautumn1990\\AppData\\Local\\TotalCMD64\\Totalcmd64.exe /O \"%1\""
+
+[HKEY_CLASSES_ROOT\Directory\shell\openWithExplorer]
+"MultiSelectModel"="Document"
+"Icon"="%SystemRoot%\\System32\\shell32.dll,3"
+@="资源管理器打开 (&O)"
+
+[HKEY_CLASSES_ROOT\Directory\shell\openWithExplorer\command]
+@=""
+"DelegateExecute"="{11dbb47c-a525-400b-9e80-a54615a090c0}"

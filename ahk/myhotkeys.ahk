@@ -11,46 +11,62 @@
 #f::
 DetectHiddenWindows,on
 IfWinNotExist ahk_class EVERYTHING
-run C:\LS\Everything\Everything.exe
+    run C:\LS\Everything\Everything.exe
 Else
 IfWinNotActive ahk_class EVERYTHING
-WinActivate ahk_class EVERYTHING
+{
+    WinActivate ahk_class EVERYTHING
+    WinWaitActive ahk_class EVERYTHING
+    send,^f
+}
 Else
-WinMinimize ahk_class EVERYTHING
+    WinMinimize ahk_class EVERYTHING
+Return
+
+;win+w 打开total commander
+#w::
+DetectHiddenWindows,on
+IfWinNotExist ahk_class TTOTAL_CMD
+run C:\Users\lautumn1990\AppData\Local\TotalCMD64\Totalcmd64.exe
+Else
+IfWinNotActive ahk_class TTOTAL_CMD
+WinActivate ahk_class TTOTAL_CMD
+Else
+WinMinimize ahk_class TTOTAL_CMD
 Return
 
 ;将当前窗口的ahk_class复制到clipboard中
-#w::WinGetClass, Clipboard, A ; Will copy the ahk_class of the Active Window to clipboard
+;#w::WinGetClass, Clipboard, A ; Will copy the ahk_class of the Active Window to clipboard
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;常用网址及命令;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;google.com
-::/g::   
+:://g::   
 Run http://www.google.com
 return 
 
 ;;baidu.com
-::/b::   
+:://b::   
 Run http://www.baidu.com
 return 
 
-::/e::   
+:://e::   
 Run C:\LS\Everything\Everything.exe   
 return 
 
-::/c::
+:://c::
 Run calc.exe
 return
 
-::/cmd::
+:://cmd::
 Run cmd.exe
 return
 
-::/ex::   
+:://ex::   
 Run explorer   
 return  
 
 ;打开任务管理器   
-::/t::   
+:://t::   
 if WinExist Windows 任务管理器   
 WinActivate   
 else   
@@ -59,7 +75,7 @@ return
 
 ;打开环境变量environment
 ;直接打开
-::/en::
+:://en::
 run rundll32.exe sysdm.cpl EditEnvironmentVariables
 return
 ; 模拟按键
@@ -72,7 +88,7 @@ return
 
 
 ;打开系统属性
-::/sys::
+:://sys::
 Run control sysdm.cpl
 return
 
@@ -90,11 +106,11 @@ Send ^c
 Run http://www.baidu.com/s?wd=%clipboard%
 return
 
-;选择一行
-!a::
-Send {Home}
-Send +{End}
-Send ^c
+;用everything 搜索
+!f::
+send ^c
+sleep 100
+run C:\LS\Everything\Everything.exe -s %clipboard%
 return
 
 ;win键 + PrintScreen键关闭屏幕
@@ -139,33 +155,90 @@ return
 ;输入自己的email
 ::;m::zhangqiu@chinasofti.com
 
+;过滤进程号
+::;gr::ps aux | grep --color=auto -i 
+
+;加颜色
+::;co::--color=auto
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;常用键盘映射;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;上页翻页键映射
-!h::Send {PgUp}
-!;::Send {PgDn}
-;HOME END键映射
-!u:: Send {Home}      ;
-!o:: Send {End}   ;
-;Alt + jkli 实现对方向键的映射,写代码的时候灰常有用
-!j:: Send {left}
-!l:: Send {right}
-!i:: Send {up}
-!k:: Send {down}
+#If !(WinActive("ahk_class TTOTAL_CMD") or WinActive("ahk_class SunAwtFrame"))
+{
+    ;选择一行
+    !a::
+    Send {Home}
+    Send +{End}
+    Send ^c
+    return
 
-;Delete Backspace的映射
-!f::Send {Backspace}
-!d::Send {Delete}
+    ;上页翻页键映射
+    !h::Send {PgUp}
+    !;::Send {PgDn}
+    ;HOME END键映射
+    !u:: Send {Home}
+    !o:: Send {End}
+    ;Alt + jkli 实现对方向键的映射,写代码的时候灰常有用
+    !j:: Send {left}
+    !l:: Send {right}
+    !i:: Send {up}
+    !k:: Send {down}
 
-;win+c复制全路径
-#IfWinActive ahk_class CabinetWClass
-#c:: 
-Clipboard = 
-Send,^c 
-ClipWait 
-path = %Clipboard% 
-Clipboard = %path% 
-Tooltip,%path% 
-Sleep,100 
-Tooltip 
-Return
+    ; Delete Backspace的映射
+    ; !f::Send {Backspace}
+    ; !d::Send {Delete}
+    return
+}
+
+
+;win+c复制全路径 在多窗口生效
+#If WinActive("ahk_class CabinetWClass") or WinActive("ahk_class EVERYTHING") or WinActive("ahk_class WorkerW")
+{
+    #c:: 
+    Clipboard = 
+    Send,^c 
+    ClipWait 
+    path = %Clipboard% 
+    Clipboard = %path% 
+    Tooltip,%path% 
+    Sleep,100 
+    Tooltip 
+    Return
+}
+
+; eclipse 复制快捷键
+#IfWinActive ahk_class SWT_Window0
+^c::Send,^c
+^v::Send,%Clipboard%
 #IfWinActive
+
+; 粘贴到前一个窗口中
+^!c::
+Send,^c
+send,!{Tab}
+sleep,200
+send,^v
+return
+
+; total commander 快捷键
+#IfWinActive ahk_class TTOTAL_CMD
+#1::ControlSend, ,#1,ahk_class TTOTAL_CMD
+#2::ControlSend, ,#2,ahk_class TTOTAL_CMD
+#3::ControlSend, ,#3,ahk_class TTOTAL_CMD
+#4::ControlSend, ,#4,ahk_class TTOTAL_CMD
+#5::ControlSend, ,#5,ahk_class TTOTAL_CMD
+#IfWinActive
+
+; word 快速复制, 临时
+; #IfWinActive ahk_class OpusApp
+; ^+w::
+; Send,^c
+; send,!{Tab}
+; Sleep,700 
+; send,^!v
+; Sleep,700
+; send,{Tab}{Tab}
+; send,!{Tab}
+; Sleep,500
+; send,{Tab}{Tab}
+; return
+; #IfWinActive

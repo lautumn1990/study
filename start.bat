@@ -10,6 +10,7 @@ REM call:programStart "vmware.exe" "C:\Users\lautumn1990\Desktop\桌面快捷方式\vm
 REM call:programStart "Xshell.exe" "C:\Users\lautumn1990\Desktop\桌面快捷方式\xs.lnk"
 call:programStart "eclipse.exe" "C:\Users\lautumn1990\Desktop\桌面快捷方式\rsa.lnk"
 call:programStart "SogouExplorer.exe" "C:\Users\lautumn1990\Desktop\桌面快捷方式\sg.lnk"
+call:programStart "SoapUI-5.0.0.exe" "C:\Users\lautumn1990\Desktop\桌面快捷方式\sp.lnk"
 
 :: 不关闭当前cmd
 :: cmd.exe

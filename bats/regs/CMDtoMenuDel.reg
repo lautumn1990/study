@@ -1,0 +1,10 @@
+Windows Registry Editor Version 5.00
+;½«cmdÈ¡Ïû
+
+[-HKEY_CLASSES_ROOT\Directory\shell\OpenCmdHere]
+
+[-HKEY_CLASSES_ROOT\Directory\Background\shell\OpenCmdHere]
+
+[-HKEY_CLASSES_ROOT\Drive\shell\OpenCmdHere]
+
+[-HKEY_CLASSES_ROOT\LibraryFolder\background\shell\OpenCmdHere]
