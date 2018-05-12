@@ -30,25 +30,25 @@ Return
 
 ;win+w 打开total commander
 #w::
-DetectHiddenWindows,on
-IfWinNotExist ahk_class TTOTAL_CMD
-run %A_AppData%\..\Local\TotalCMD64\Totalcmd64.exe
-Else
-IfWinNotActive ahk_class TTOTAL_CMD
-WinActivate ahk_class TTOTAL_CMD
-Else
-WinMinimize ahk_class TTOTAL_CMD
+    DetectHiddenWindows,on
+    IfWinNotExist ahk_class TTOTAL_CMD
+        run %A_AppData%\..\Local\TotalCMD64\Totalcmd64.exe
+    Else
+    IfWinNotActive ahk_class TTOTAL_CMD
+        WinActivate ahk_class TTOTAL_CMD
+    Else
+        WinMinimize ahk_class TTOTAL_CMD
 Return
 
 :://cc::
-send, %A_AppDataCommon%
+    send, %A_AppDataCommon%
 return
 
 :://rrr::
-Reload
-Sleep 1000 ; 如果成功, 则 reload 会在 Sleep 期间关闭这个实例, 所以下面这行语句永远不会执行.
-MsgBox, 4,, The script could not be reloaded. Would you like to open it for editing?
-IfMsgBox, Yes, Edit
+    Reload
+    Sleep 1000 ; 如果成功, 则 reload 会在 Sleep 期间关闭这个实例, 所以下面这行语句永远不会执行.
+    MsgBox, 4,, The script could not be reloaded. Would you like to open it for editing?
+    IfMsgBox, Yes, Edit
 return
 
 ;将当前窗口的ahk_class复制到clipboard中
@@ -57,24 +57,24 @@ return
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;常用网址及命令;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;google.com
 :*://g::   
-Run http://www.google.com
+    Run http://www.google.com
 return 
 
 ;;baidu.com
 :*://b::   
-Run http://www.baidu.com
+    Run http://www.baidu.com
 return 
 
 :://e::   
-Run C:\LS\Everything\Everything.exe   
+    Run C:\LS\Everything\Everything.exe   
 return 
 
 :*://c::
-Run calc.exe
+    Run calc.exe
 return
 
 :*://cmd::
-Run cmd.exe
+    Run cmd.exe
 return
 
 :*://ex::   
@@ -83,16 +83,16 @@ return
 
 ;打开任务管理器   
 :*://t::   
-if WinExist Windows 任务管理器   
-WinActivate   
-else   
-Run taskmgr.exe   
+    if WinExist Windows 任务管理器   
+        WinActivate   
+    else   
+        Run taskmgr.exe   
 return   
 
 ;打开环境变量environment
 ;直接打开
 :*://en::
-run rundll32.exe sysdm.cpl EditEnvironmentVariables
+    run rundll32.exe sysdm.cpl EditEnvironmentVariables
 return
 ; 模拟按键
 ; ::/en::   
@@ -105,42 +105,42 @@ return
 
 ;打开系统属性
 :*://sys::
-Run control sysdm.cpl
+    Run control sysdm.cpl
 return
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;常用网址搜索;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;google搜索
 !g::
-Send ^c
-Run http://www.google.com/search?q=%clipboard%
+    Send ^c
+    Run http://www.google.com/search?q=%clipboard%
 return
 
 ;百度搜索
 !b::
-Send ^c
-Run http://www.baidu.com/s?wd=%clipboard%
+    Send ^c
+    Run http://www.baidu.com/s?wd=%clipboard%
 return
 
 ;用everything 搜索
 !f::
-send ^c
-sleep 100
-run C:\LS\Everything\Everything.exe -s %clipboard%
+    send ^c
+    sleep 100
+    run C:\LS\Everything\Everything.exe -s %clipboard%
 return
 
 ;win键 + PrintScreen键关闭屏幕
 #PrintScreen::
-KeyWait PrintScreen
-KeyWait LWin ;释放左Win键才激活下面的命令
-SendMessage,0x112,0xF170,2,,Program Manager ;关闭显示器。0x112:WM_SYSCOMMAND，0xF170:SC_MONITORPOWER。2：关闭，-1：开启显示器
+    KeyWait PrintScreen
+    KeyWait LWin ;释放左Win键才激活下面的命令
+    SendMessage,0x112,0xF170,2,,Program Manager ;关闭显示器。0x112:WM_SYSCOMMAND，0xF170:SC_MONITORPOWER。2：关闭，-1：开启显示器
 Return
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;<Notepad>;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 #IfWinActive ahk_class Notepad
 ;ctrl+d复制一行
 ^d::
-Send {Home}+{End}^c{End}{enter}^v
+    Send {Home}+{End}^c{End}{enter}^v
 return
 ; ;剪切一行
 ; ^x::
@@ -158,11 +158,11 @@ Return
 ;工单号
 ::;im::IM-20160707-10724
 :*:;ii::
-SendInput,IM-20160707-10724
-Click, 975, 310
-send,{Space}
-sleep,100
-Click, 351,600
+    SendInput,IM-20160707-10724
+    Click, 975, 310
+    send,{Space}
+    sleep,100
+    Click, 351,600
 return
 
 ;linux命令目录大小
@@ -178,11 +178,11 @@ return
 
 ;获取当前ip地址
 :*:;ip::
-send,%A_IPAddress1%
+    send,%A_IPAddress1%
 return
 
 ;输入自己的email
-::;m::zhangqiu@chinasofti.com
+:*:;z@c::zhangqiu@chinasofti.com
 
 ;过滤进程号
 :*:;gr::ps aux | grep --color=auto -i 
@@ -193,8 +193,8 @@ return
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;capslock;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;capslock刷新当前autohotkey脚本
 CapsLock & r::
-sleep,100
-Reload
+    sleep,100
+    Reload
 return
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;常用键盘映射;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -278,3 +278,57 @@ return
 ; send,{Tab}{Tab}
 ; return
 ; #IfWinActive
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;窗口操作;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+; 右键加滑轮 实现切换窗口功能
+~RButton & WheelUp:: ShiftAltTab
+~RButton & WheelDown:: AltTab
+; win键+右键 窗口置顶
+~LWin & RButton::
+    winset, AlwaysOnTop, Toggle, A
+    WinGet, Ex, ExStyle, A
+    if (Ex & 0x8)
+        tooltip 窗口置顶
+    Else
+        tooltip 取消置顶
+    SetTimer, RemoveToolTip, 1000
+return
+
+;win+滑轮切换透明度
+; 增加透明度
+~LWin & WheelUp::  
+; 减少透明度
+~LWin & WheelDown:: 
+; 恢复透明度
+~LWin & Mbutton:: 
+    WinGet, Trans, Transparent,A  
+    If (Trans="")  
+        Trans=255  
+    thiskey := A_ThisHotkey
+    if RegExMatch(thiskey,"WheelUp")>0
+    {
+        Transparent_New:=Trans+20    ;◆透明度增加速度。  
+        If (Transparent_New > 254)  
+            Transparent_New =255  
+    }
+    else if RegExMatch(thiskey,"WheelDown")>0
+    {
+        Transparent_New:=Trans-20  ;◆透明度减少速度。  
+        If (Transparent_New < 150)    ;◆最小透明度限制。  
+            Transparent_New = 150  
+    }
+    else if RegExMatch(thiskey,"Mbutton")>0
+    {
+        Transparent_New = 255 
+    }
+    WinSet,Transparent,%Transparent_New%,A  
+    tooltip %Transparent_New%  ;查看当前透明度（操作之后的）。  
+    SetTimer, RemoveToolTip, 1000
+return  
+
+; 清除窗口提示
+RemoveToolTip:
+    SetTimer, RemoveToolTip, Off
+    ToolTip
+return
