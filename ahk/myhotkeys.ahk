@@ -6,6 +6,11 @@
 ;+ Shift 
 ;&  An ampersand may be used between any two keys or mouse buttons to combine them into a custom hotkey.  
 
+#NoEnv  ; Recommended for performance and compatibility with future AutoHotkey releases.
+; #Warn  ; Enable warnings to assist with detecting common errors.
+SendMode Input  ; Recommended for new scripts due to its superior speed and reliability.
+SetWorkingDir %A_ScriptDir%  ; Ensures a consistent starting directory.
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;全局常用快捷键;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;win+f 打开everything
 #f::
@@ -27,7 +32,7 @@ Return
 #w::
 DetectHiddenWindows,on
 IfWinNotExist ahk_class TTOTAL_CMD
-run C:\Users\lautumn1990\AppData\Local\TotalCMD64\Totalcmd64.exe
+run %A_AppData%\..\Local\TotalCMD64\Totalcmd64.exe
 Else
 IfWinNotActive ahk_class TTOTAL_CMD
 WinActivate ahk_class TTOTAL_CMD
@@ -35,17 +40,28 @@ Else
 WinMinimize ahk_class TTOTAL_CMD
 Return
 
+:://cc::
+send, %A_AppDataCommon%
+return
+
+:://rrr::
+Reload
+Sleep 1000 ; 如果成功, 则 reload 会在 Sleep 期间关闭这个实例, 所以下面这行语句永远不会执行.
+MsgBox, 4,, The script could not be reloaded. Would you like to open it for editing?
+IfMsgBox, Yes, Edit
+return
+
 ;将当前窗口的ahk_class复制到clipboard中
 ;#w::WinGetClass, Clipboard, A ; Will copy the ahk_class of the Active Window to clipboard
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;常用网址及命令;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;google.com
-:://g::   
+:*://g::   
 Run http://www.google.com
 return 
 
 ;;baidu.com
-:://b::   
+:*://b::   
 Run http://www.baidu.com
 return 
 
@@ -53,20 +69,20 @@ return
 Run C:\LS\Everything\Everything.exe   
 return 
 
-:://c::
+:*://c::
 Run calc.exe
 return
 
-:://cmd::
+:*://cmd::
 Run cmd.exe
 return
 
-:://ex::   
+:*://ex::   
 Run explorer   
 return  
 
 ;打开任务管理器   
-:://t::   
+:*://t::   
 if WinExist Windows 任务管理器   
 WinActivate   
 else   
@@ -75,7 +91,7 @@ return
 
 ;打开环境变量environment
 ;直接打开
-:://en::
+:*://en::
 run rundll32.exe sysdm.cpl EditEnvironmentVariables
 return
 ; 模拟按键
@@ -88,7 +104,7 @@ return
 
 
 ;打开系统属性
-:://sys::
+:*://sys::
 Run control sysdm.cpl
 return
 
@@ -141,14 +157,27 @@ Return
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;常用缩写;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;工单号
 ::;im::IM-20160707-10724
+:*:;ii::
+SendInput,IM-20160707-10724
+Click, 975, 310
+send,{Space}
+sleep,100
+Click, 351,600
+return
+
 ;linux命令目录大小
-::;du::du -kh --max-depth=1
+:*:;du::du -kh --max-depth=1
 ;mdm日志路径
-::;mdmlog::/home/weblogic/bea/user_projects/domains/mdmdomain/logs
-;ecif日志路径
+:*:;mdmlog::/home/weblogic/bea/user_projects/domains/mdmdomain/logs
+
+;mdm项目路径
+:*:;mdm::/home/weblogic/bea/user_projects/domains/mdmdomain
+
+;ecif项目路径
+:*:;ecif::/home/middleware/weblogic1213/user_projects/domains/ecifdomain8001
 
 ;获取当前ip地址
-::;ip::
+:*:;ip::
 send,%A_IPAddress1%
 return
 
@@ -156,13 +185,20 @@ return
 ::;m::zhangqiu@chinasofti.com
 
 ;过滤进程号
-::;gr::ps aux | grep --color=auto -i 
+:*:;gr::ps aux | grep --color=auto -i 
 
 ;加颜色
-::;co::--color=auto
+:*:;co::--color=auto
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;capslock;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;capslock刷新当前autohotkey脚本
+CapsLock & r::
+sleep,100
+Reload
+return
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;常用键盘映射;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-#If !(WinActive("ahk_class TTOTAL_CMD") or WinActive("ahk_class SunAwtFrame"))
+If !(WinActive("ahk_class TTOTAL_CMD") or WinActive("ahk_class SunAwtFrame"))
 {
     ;选择一行
     !a::
@@ -191,7 +227,7 @@ return
 
 
 ;win+c复制全路径 在多窗口生效
-#If WinActive("ahk_class CabinetWClass") or WinActive("ahk_class EVERYTHING") or WinActive("ahk_class WorkerW")
+If WinActive("ahk_class CabinetWClass") or WinActive("ahk_class EVERYTHING") or WinActive("ahk_class WorkerW")
 {
     #c:: 
     Clipboard = 
@@ -206,10 +242,10 @@ return
 }
 
 ; eclipse 复制快捷键
-#IfWinActive ahk_class SWT_Window0
-^c::Send,^c
-^v::Send,%Clipboard%
-#IfWinActive
+; #IfWinActive ahk_class SWT_Window0
+; ^c::Send,^c
+; ^v::Send,%Clipboard%
+; #IfWinActive
 
 ; 粘贴到前一个窗口中
 ^!c::
