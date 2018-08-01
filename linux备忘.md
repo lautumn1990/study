@@ -93,6 +93,8 @@
         - [4. 递归缩写](#4-%E9%80%92%E5%BD%92%E7%BC%A9%E5%86%99)
         - [5. 其他缩写](#5-%E5%85%B6%E4%BB%96%E7%BC%A9%E5%86%99)
         - [6. 参考资料](#6-%E5%8F%82%E8%80%83%E8%B5%84%E6%96%99)
+    - [linux操作](#linux%E6%93%8D%E4%BD%9C)
+        - [shell获取ip地址](#shell%E8%8E%B7%E5%8F%96ip%E5%9C%B0%E5%9D%80)
 
 ## 经典语句
 
@@ -3087,3 +3089,20 @@ tzselect |  Time Zone SELECT |
 - [Tcl](https://zh.wikipedia.org/wiki/Tcl?oldformat=true)
 - [Unix Command Acronyms](http://www.abbreviations.com/acronyms/UNIX)
 - [Linux常用缩写](http://blog.wangmingkuo.com/abbreviation-in-linux/)
+
+## linux操作  
+
+### shell获取ip地址  
+
+方法一
+
+```shell
+arg=ifconfig eth0 |grep "inet addr"| cut -f 2 -d ":"|cut -f 1 -d " "  
+ipaddr=$arg
+```
+
+方法二  
+
+```shell
+/sbin/ifconfig -a|grep inet|grep -v 127.0.0.1|grep -v inet6 | awk '{print $2}' | tr -d "addr:"
+```
