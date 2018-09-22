@@ -190,11 +190,43 @@ return
 ;加颜色
 :*:;co::--color=auto
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;capslock;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;capslock刷新当前autohotkey脚本
+; windows 根据名称杀死进程
+:*:;tk::taskkill /F /IM ` 
+
+; linux 根据名称杀死进程
+:*:;ki::
+    send,ps -ef | grep  | grep -v grep | awk `'{{}print $2`{}}`' | xargs kill -9
+    send,{left 50}
+return
+
+;;; 数据库
+:*:;se::
+send,select `* from ` `;
+Send {left}
+return
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;capslock 全局生效;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;capslock + r刷新当前autohotkey脚本
 CapsLock & r::
     sleep,100
     Reload
+return
+
+;capslock + x 剪切当前行
+CapsLock & x::
+    send {home}+{end}^x
+return
+
+;capslock + c 复制当前行
+CapsLock & c::
+    send {home}+{end}^c
+return
+
+;capslock + d 复制并删帖行
+CapsLock & d::
+    send {home}+{end}^c
+    send {end}{enter}^v
 return
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;常用键盘映射;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -247,11 +279,11 @@ If WinActive("ahk_class CabinetWClass") or WinActive("ahk_class EVERYTHING") or 
 ; ^v::Send,%Clipboard%
 ; #IfWinActive
 
-; 粘贴到前一个窗口中
+; 粘贴到前一个窗口中, ctrl+alt+c
 ^!c::
 Send,^c
 send,!{Tab}
-sleep,200
+sleep,500
 send,^v
 return
 
