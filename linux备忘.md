@@ -95,6 +95,7 @@
         - [6. 参考资料](#6-%E5%8F%82%E8%80%83%E8%B5%84%E6%96%99)
     - [linux操作](#linux%E6%93%8D%E4%BD%9C)
         - [shell获取ip地址](#shell%E8%8E%B7%E5%8F%96ip%E5%9C%B0%E5%9D%80)
+        - [批量修改目录权限](#%E6%89%B9%E9%87%8F%E4%BF%AE%E6%94%B9%E7%9B%AE%E5%BD%95%E6%9D%83%E9%99%90)
 
 ## 经典语句
 
@@ -3105,4 +3106,13 @@ ipaddr=$arg
 
 ```shell
 /sbin/ifconfig -a|grep inet|grep -v 127.0.0.1|grep -v inet6 | awk '{print $2}' | tr -d "addr:"
+```
+
+### 批量修改目录权限
+
+```shell
+# To change all the directories to 755 (drwxr-xr-x):
+find /opt/lampp/htdocs -type d -exec chmod 755 {} \;
+# To change all the files to 644 (-rw-r--r--):
+find /opt/lampp/htdocs -type f -exec chmod 644 {} \;
 ```
