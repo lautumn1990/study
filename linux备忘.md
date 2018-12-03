@@ -124,6 +124,11 @@
 `uname -sr` 系统核心版本
 
 `date` 当前日期 date  
+    查看时区
+    `date +"%Z %z"`
+    `date -R`  
+    `datetimetcl | grep "Timezone"`  
+    `cat /etc/timezone`
 `cal` 日历  
 `bc` 计算器 默认整数 scale=3 保留三位有效数字 quit退出  
 `exit` 退出 ctrl+d  
