@@ -14,18 +14,18 @@ SetWorkingDir %A_ScriptDir%  ; Ensures a consistent starting directory.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;全局常用快捷键;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;win+f 打开everything
 #f::
-DetectHiddenWindows,on
-IfWinNotExist ahk_class EVERYTHING
-    run C:\LS\Everything\Everything.exe
-Else
-IfWinNotActive ahk_class EVERYTHING
-{
-    WinActivate ahk_class EVERYTHING
-    WinWaitActive ahk_class EVERYTHING
-    send,^f
-}
-Else
-    WinMinimize ahk_class EVERYTHING
+    DetectHiddenWindows,on
+    IfWinNotExist ahk_class EVERYTHING
+        run C:\LS\Everything\Everything.exe
+    Else
+    IfWinNotActive ahk_class EVERYTHING
+    {
+        WinActivate ahk_class EVERYTHING
+        WinWaitActive ahk_class EVERYTHING
+        send,^f
+    }
+    Else
+        WinMinimize ahk_class EVERYTHING
 Return
 
 ;win+w 打开total commander
