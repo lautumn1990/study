@@ -5,6 +5,8 @@
 ;^ Control 
 ;+ Shift 
 ;&  An ampersand may be used between any two keys or mouse buttons to combine them into a custom hotkey.  
+;复制路径乱码问题, 应该使用U64版本, 不使用A32
+;转义字符 { 需要用 {{}, }需要用{}}, 其他用`
 
 #NoEnv  ; Recommended for performance and compatibility with future AutoHotkey releases.
 ; #Warn  ; Enable warnings to assist with detecting common errors.
@@ -205,6 +207,13 @@ send,select `* from ` `;
 Send {left}
 return
 
+; test in idea
+:*:;te::
+    send,@Test{Enter}public void testname(){{}{Enter}
+    send,{up 1}
+    send,^{right 2}
+    send,^+{right 1}
+return
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;capslock 全局生效;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;capslock + r刷新当前autohotkey脚本
@@ -230,7 +239,7 @@ CapsLock & d::
 return
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;常用键盘映射;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-If !(WinActive("ahk_class TTOTAL_CMD") or WinActive("ahk_class SunAwtFrame"))
+#If !(WinActive("ahk_class TTOTAL_CMD") or WinActive("ahk_class SunAwtFrame"))
 {
     ;选择一行
     !a::
@@ -256,10 +265,10 @@ If !(WinActive("ahk_class TTOTAL_CMD") or WinActive("ahk_class SunAwtFrame"))
     ; !d::Send {Delete}
     return
 }
-
+#If
 
 ;win+c复制全路径 在多窗口生效
-If WinActive("ahk_class CabinetWClass") or WinActive("ahk_class EVERYTHING") or WinActive("ahk_class WorkerW")
+#If WinActive("ahk_class CabinetWClass") or WinActive("ahk_class EVERYTHING") or WinActive("ahk_class WorkerW")
 {
     #c:: 
     Clipboard = 
@@ -272,6 +281,7 @@ If WinActive("ahk_class CabinetWClass") or WinActive("ahk_class EVERYTHING") or 
     Tooltip 
     Return
 }
+#If
 
 ; eclipse 复制快捷键
 ; #IfWinActive ahk_class SWT_Window0
