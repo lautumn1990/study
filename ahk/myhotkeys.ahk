@@ -56,6 +56,17 @@ return
 ;将当前窗口的ahk_class复制到clipboard中
 ;#w::WinGetClass, Clipboard, A ; Will copy the ahk_class of the Active Window to clipboard
 
+; 禁用ctrl+space
+; ^space::return
+; idea 禁用ctrl+space
+#If WinActive("ahk_exe idea64.exe")
+{
+    ^space::
+        ControlSend, , ^{space}
+    return
+}
+#If
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;常用网址及命令;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;google.com
 :*://g::   
