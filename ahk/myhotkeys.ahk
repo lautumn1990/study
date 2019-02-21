@@ -162,9 +162,9 @@ return
 #IfWinActive
 
 #IfWinActive ahk_class Chrome_WidgetWin_1
-^+v::
-   send,IM-20160707-10724
-Return
+; ^+v::
+;    send,IM-20160707-10724
+; Return
 #IfWinActive
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;常用缩写;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -205,6 +205,20 @@ return
 
 ; windows 根据名称杀死进程
 :*:;tk::taskkill /F /IM ` 
+
+; ;to 输入当前日期20190215 即 today日期
+:*:;to::
+    FormatTime, now_date, %A_Now%, yyyyMMdd ;格式化当前时间
+    now_date := "{# 3} " . now_date . "` ` {Enter 2}"
+    sleep,30
+    Send, %now_date% ;发送时间
+return
+
+; ;ta 输入markdown中的task前缀
+:*:;ta::
+    sleep,30
+    send, - [ ]` ` 
+return
 
 ; linux 根据名称杀死进程
 :*:;ki::
