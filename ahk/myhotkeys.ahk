@@ -59,9 +59,10 @@ return
 ; ½ûÓÃctrl+space
 ; ^space::return
 ; idea ½ûÓÃctrl+space
-#If WinActive("ahk_exe idea64.exe")
+#If (WinActive("ahk_exe idea64.exe") or WinActive("ahk_exe Code.exe"))
 {
     ^space::
+        sleep 100
         ControlSend, , ^{space}
     return
 }
