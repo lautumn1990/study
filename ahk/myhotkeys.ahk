@@ -70,26 +70,26 @@ return
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;常用网址及命令;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;google.com
-:*://g::   
-    Run http://www.google.com
-return 
+; :*://g::   
+;     Run http://www.google.com
+; return 
 
 ;;baidu.com
-:*://b::   
-    Run http://www.baidu.com
-return 
+; :*://b::   
+;     Run http://www.baidu.com
+; return 
 
-:://e::   
-    Run C:\LS\Everything\Everything.exe   
-return 
+; :://e::   
+;     Run C:\LS\Everything\Everything.exe   
+; return 
 
-:*://c::
-    Run calc.exe
-return
+; :*://c::
+;     Run calc.exe
+; return
 
-:*://cmd::
-    Run cmd.exe
-return
+; :*://cmd::
+;     Run cmd.exe
+; return
 
 :*://ex::   
 Run explorer   
@@ -125,16 +125,16 @@ return
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;常用网址搜索;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;google搜索
-!g::
-    Send ^c
-    Run http://www.google.com/search?q=%clipboard%
-return
+; !g::
+;     Send ^c
+;     Run http://www.google.com/search?q=%clipboard%
+; return
 
 ;百度搜索
-!b::
-    Send ^c
-    Run http://www.baidu.com/s?wd=%clipboard%
-return
+; !b::
+;     Send ^c
+;     Run http://www.baidu.com/s?wd=%clipboard%
+; return
 
 ;用everything 搜索
 !f::
@@ -297,15 +297,29 @@ return
 #If WinActive("ahk_class CabinetWClass") or WinActive("ahk_class EVERYTHING") or WinActive("ahk_class WorkerW")
 {
     #c:: 
-    Clipboard = 
-    Send,^c 
-    ClipWait 
-    path = %Clipboard% 
-    Clipboard = %path% 
-    Tooltip,%path% 
-    Sleep,100 
-    Tooltip 
+        Clipboard = 
+        Send,^c 
+        ClipWait 
+        path = %Clipboard% 
+        Clipboard = %path% 
+        Tooltip,%path% 
+        Sleep,500 
+        Tooltip 
     Return
+
+    ; 复制路径名
+    CapsLock & c::
+        Clipboard = 
+        Send,^c 
+        ClipWait
+        filename = %Clipboard%
+        StringGetPos, index, filename, \, R
+        if index >= 0
+        {
+            filename := SubStr(filename, 1,index+1)
+            Clipboard = %filename%
+        }
+    return
 }
 #If
 
