@@ -6,10 +6,10 @@ Windows Registry Editor Version 5.00
 
 [HKEY_CLASSES_ROOT\Drive\shell\open]
 @="用TC打开"
-"Icon"="C:\\Users\\lautumn1990\\AppData\\Local\\TotalCMD64\\Totalcmd64.exe"
+"Icon"="%LOCALAPPDATA%\\TotalCMD64\\Totalcmd64.exe"
 
 [HKEY_CLASSES_ROOT\Drive\shell\open\command]
-@="C:\\Users\\lautumn1990\\AppData\\Local\\TotalCMD64\\Totalcmd64.exe /O \"%1\""
+@="%LOCALAPPDATA%\\TotalCMD64\\Totalcmd64.exe /O \"%1\""
 
 [HKEY_CLASSES_ROOT\Drive\shell\openWithExplorer]
 "MultiSelectModel"="Document"
@@ -25,10 +25,10 @@ Windows Registry Editor Version 5.00
 
 [HKEY_CLASSES_ROOT\Directory\shell\open]
 @="用TC打开"
-"Icon"="C:\\Users\\lautumn1990\\AppData\\Local\\TotalCMD64\\Totalcmd64.exe"
+"Icon"="%LOCALAPPDATA%\\TotalCMD64\\Totalcmd64.exe"
 
 [HKEY_CLASSES_ROOT\Directory\shell\open\command]
-@="C:\\Users\\lautumn1990\\AppData\\Local\\TotalCMD64\\Totalcmd64.exe /O \"%1\""
+@="%LOCALAPPDATA%\\TotalCMD64\\Totalcmd64.exe /O \"%1\""
 
 [HKEY_CLASSES_ROOT\Directory\shell\openWithExplorer]
 "MultiSelectModel"="Document"
