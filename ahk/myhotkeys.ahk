@@ -264,26 +264,42 @@ return
 return
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;capslock 全局生效;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;capslock + r刷新当前autohotkey脚本
+; capslock + r刷新当前autohotkey脚本
 CapsLock & r::
     sleep,100
     Reload
 return
 
-;capslock + x 剪切当前行
+; capslock + x 剪切当前行
 CapsLock & x::
-    send {home}+{end}^x
+    send {home}+{down}^x
 return
 
-;capslock + c 复制当前行
+; capslock + c 复制当前行
 CapsLock & c::
     send {home}+{end}^c
 return
 
-;capslock + d 复制并删帖行
+; capslock + d 复制并删帖行
 CapsLock & d::
     send {home}+{end}^c
     send {end}{enter}^v
+return
+
+; capslock + w 取消所有窗口置顶, 防止出现多次置顶问题
+CapsLock & w::
+    WinGet, id, List,,, Program Manager
+    Loop, %id%
+    {
+        this_id := id%A_Index%
+        WinGet, Ex, ExStyle, ahk_id %this_id%
+        if (Ex & 0x8){
+            winset, AlwaysOnTop, off, ahk_id %this_id%
+            WinMinimize, ahk_id %this_id%
+        }
+    }
+    tooltip 取消所有窗口置顶
+    SetTimer, RemoveToolTip, 1000
 return
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;常用键盘映射;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
