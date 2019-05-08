@@ -44,24 +44,23 @@ Return
 
 ;win+w 打开total commander
 #w::
-    windowMaxMinFun("TTOTAL_CMD","%A_AppData%\..\Local\TotalCMD64\Totalcmd64.exe")
+    windowMaxMinFun("ahk_class TTOTAL_CMD",A_AppData "\..\Local\TotalCMD64\Totalcmd64.exe")
 return
 
 ;win+y 打开有道词典
 #y::
-    windowMaxMinFun("YodaoMainWndClass","%A_AppData%\..\Local\youdao\dict\Application\YodaoDict.exe")
+    windowMaxMinFun("ahk_class YodaoMainWndClass",A_AppData "\..\Local\youdao\dict\Application\YodaoDict.exe")
 return
 
 ; 将已启动程序置为当前, 或者重新启动, 最小化
-windowMaxMinFun(CL,PATH){
+windowMaxMinFun(CL, CLPATH){
     DetectHiddenWindows,on
-    IfWinNotExist ahk_class %CL%
-        run %PATH%
-    Else
-    IfWinNotActive ahk_class %CL%
-        WinActivate ahk_class %CL%
-    Else
-        WinMinimize ahk_class %CL%
+    if !WinExist(CL)
+        run %CLPATH%
+    else if !WinActive(CL)
+        WinActivate %CL%
+    else
+        WinMinimize %CL%
     Return
 }
 
