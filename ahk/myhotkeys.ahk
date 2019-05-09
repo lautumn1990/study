@@ -272,7 +272,7 @@ return
 
 ; capslock + x 剪切当前行
 CapsLock & x::
-    send {home}+{down}^x
+    send {home}+{end}^x
 return
 
 ; capslock + c 复制当前行
