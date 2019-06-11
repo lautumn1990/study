@@ -351,7 +351,7 @@ return
         Send,^c 
         ClipWait
         filename = %Clipboard%
-        StringGetPos, index, filename, \, R
+        StringGetPos, index, filename, \, R ; R表示从右侧开始查找, 默认是L从左侧开始查找
         if index >= 0
         {
             filename := SubStr(filename, 1,index+1)
@@ -360,6 +360,12 @@ return
     return
 }
 #If
+
+#If WinActive("ahk_class TTOTAL_CMD")
+{
+    #c::Send,^3
+    CapsLock & c::Send,^1
+}
 
 ; eclipse 复制快捷键
 ; #IfWinActive ahk_class SWT_Window0
