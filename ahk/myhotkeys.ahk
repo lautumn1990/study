@@ -300,6 +300,11 @@ CapsLock & w::
     SetTimer, RemoveToolTip, 1000
 return
 
+; 删除桌面上的ConEmu错误文件
+CapsLock & t::
+    FileRemoveDir,%A_Desktop%\ConEmuTrap
+return
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;常用键盘映射;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 #If !(WinActive("ahk_class TTOTAL_CMD") or WinActive("ahk_class SunAwtFrame"))
 {
