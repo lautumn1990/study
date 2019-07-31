@@ -302,7 +302,7 @@ return
 
 ; 删除桌面上的ConEmu错误文件
 CapsLock & t::
-    FileRemoveDir,%A_Desktop%\ConEmuTrap
+    FileRemoveDir,%A_Desktop%\ConEmuTrap,1
 return
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;常用键盘映射;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
