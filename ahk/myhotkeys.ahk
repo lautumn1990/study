@@ -364,6 +364,19 @@ return
 }
 #If
 
+#IF WinActive("ahk_exe explorer.exe")
+{
+    F4::
+        ClipSaved := ClipboardAll
+        Clipboard := ""
+        Send ^c
+        ClipWait
+        filename := Clipboard
+        Clipboard := ClipSaved
+        run, "%A_APPDATA%\..\Local\Programs\Microsoft VS Code\Code.exe" "%filename%"
+    return
+}
+
 #If WinActive("ahk_class TTOTAL_CMD")
 {
     #c::Send,^3
