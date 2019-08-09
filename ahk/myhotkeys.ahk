@@ -367,14 +367,44 @@ return
 #IF WinActive("ahk_exe explorer.exe")
 {
     F4::
+        if (winf4_presses > 0) ; SetTimer already started, so we log the keypress instead.
+        {
+            winf4_presses += 1
+            return
+        }
+        ; Otherwise, this is the first press of a new series. Set count to 1 and start
+        ; the timer:
         ClipSaved := ClipboardAll
         Clipboard := ""
         Send ^c
         ClipWait
         filename := Clipboard
         Clipboard := ClipSaved
-        run, "%A_APPDATA%\..\Local\Programs\Microsoft VS Code\Code.exe" "%filename%"
+        winf4_presses := 1
+        SetTimer, KeyWinF4, -400 ; Wait for more presses within a 400 millisecond window.
     return
+
+    KeyWinF4:
+        if (winf4_presses = 1) ; The key was pressed once.
+        {
+            ; Run, m:\  ; Open a folder.
+            run, "%A_APPDATA%\..\Local\Programs\Microsoft VS Code\Code.exe" "%filename%"
+        }
+        else if (winf4_presses = 2) ; The key was pressed twice.
+        {
+            ; Run, m:\multimedia  ; Open a different folder.
+            run, "id.lnk" "%filename%"
+        }
+        else if (winf4_presses > 2)
+        {
+            ; MsgBox, Three or more clicks detected.
+            MsgBox , "double click f4 3 more times"
+        }
+        ; Regardless of which action above was triggered, reset the count to
+        ; prepare for the next series of presses:
+        winf4_presses := 0
+    return
+
 }
 
 #If WinActive("ahk_class TTOTAL_CMD")
