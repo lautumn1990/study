@@ -88,6 +88,77 @@ return
 }
 #If
 
+; #If (WinActive("ahk_exe idea64.exe"))
+; {
+;     ~Ctrl::
+;         ;400 is the maximum allowed delay (in milliseconds) between presses.
+;         if (A_PriorHotKey = "~Ctrl" AND A_TimeSincePriorHotkey < 400)
+;         {
+;             ; ;Put code to be executed here.
+;             ; Msgbox,Double press detected.
+;             ControlSend, , {Ctrl 2}, A
+;             ; return
+;         }
+;         Sleep 0
+;         KeyWait Ctrl
+;     return
+; }
+; #If
+
+; ; idea 中 三次ctrl 为 有道翻译
+
+; #If (WinActive("ahk_exe idea64.exe"))
+; {
+;     $Ctrl::
+;         ; Sleep 0
+;         ; KeyWait Ctrl
+;         ; MsgBox, "abc"
+;         if (control_presses > 0) ; SetTimer already started, so we log the keypress instead.
+;         {
+;             control_presses += 1
+;             return
+;         }
+;         ; MsgBox, "123"
+;         ; Otherwise, this is the first press of a new series. Set count to 1 and start
+;         ; the timer:
+;         control_presses := 1
+;         SetTimer, KeyControl, -1000 ; Wait for more presses within a 400 millisecond window.
+;     return
+
+;     KeyControl:
+;         ; MsgBox, %control_presses%
+;         ; return
+;         if (control_presses = 1) ; The key was pressed once.
+;         {
+;             ; Run, m:\  ; Open a folder.
+;             ; run, "%A_APPDATA%\..\Local\Programs\Microsoft VS Code\Code.exe" "%filename%"
+;             ; ControlSend, , {Ctrl}, A
+;             ; MsgBox, "abc"
+;             ; ControlSend, , ^{space}, A
+;             ControlSend, , {Escape}, A
+;         }
+;         else if (control_presses = 2) ; The key was pressed twice.
+;         {
+;             ; Run, m:\multimedia  ; Open a different folder.
+;             ; ControlSend, , ^^, A
+;             ControlSend, , {Escape}, A
+;             ControlSend, , {Ctrl 2}, A
+;             ; return
+;         }
+;         else if (control_presses = 3)
+;         {
+;             ; MsgBox, Three or more clicks detected.
+;             ; MsgBox , "double click f4 3 more times"
+;             ControlSend, , {Ctrl 2}
+;         }
+;         ; MsgBox, %control_presses%
+;         ; Regardless of which action above was triggered, reset the count to
+;         ; prepare for the next series of presses:
+;         control_presses := 0
+;     return
+
+; }
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;常用网址及命令;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;google.com
 ; :*://g::   
