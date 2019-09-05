@@ -97,7 +97,9 @@ return
         if (control_presses > 0) ; SetTimer already started, so we log the keypress instead.
         {
             ; DllCall("QueryPerformanceCounter", "Int64*", CounterAfter)          ; test click time
-            ; MyToolTip((CounterAfter - CounterBefore) / freq * 1000 " ms")       ; test click time
+            ; MyToolTip((CounterAfter - CounterBefore) / freq * 1000 " ms", 3000)       ; test click time
+            SetTimer, KeyControl, Off
+            SetTimer, KeyControl, -200
             control_presses += 1
             return
         }
@@ -105,14 +107,14 @@ return
         BlockInput On
         ; DllCall("QueryPerformanceFrequency", "Int64*", freq)                    ; test click time
         ; DllCall("QueryPerformanceCounter", "Int64*", CounterBefore)             ; test click time
-        SetTimer, KeyControl, -400 ; press 3 times about 350ms ; Wait for more presses within a 400 millisecond window.
+        SetTimer, KeyControl, -200 ; press 3 times about 350ms ; Wait for more presses within a 400 millisecond window.
     return
 
     KeyControl:
         BlockInput Off
         if (control_presses = 1) ; The key was pressed once.
         {
-            ControlSend, , {Ctrl}, A
+            ; ControlSend, , {Ctrl}, A
         }
         else if (control_presses = 2) ; The key was pressed twice.
         {
