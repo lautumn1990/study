@@ -88,6 +88,50 @@ return
 }
 #If
 
+; ; idea 中 三次ctrl为 有道翻译, 两次ctrl为run anything
+
+#If (WinActive("ahk_exe idea64.exe"))
+{
+    $Ctrl::
+        KeyWait Ctrl
+        if (control_presses > 0) ; SetTimer already started, so we log the keypress instead.
+        {
+            ; DllCall("QueryPerformanceCounter", "Int64*", CounterAfter)          ; test click time
+            ; MyToolTip((CounterAfter - CounterBefore) / freq * 1000 " ms", 3000)       ; test click time
+            SetTimer, KeyControl, Off
+            SetTimer, KeyControl, -200
+            control_presses += 1
+            return
+        }
+        control_presses := 1
+        BlockInput On
+        ; DllCall("QueryPerformanceFrequency", "Int64*", freq)                    ; test click time
+        ; DllCall("QueryPerformanceCounter", "Int64*", CounterBefore)             ; test click time
+        SetTimer, KeyControl, -200 ; press 3 times about 350ms ; Wait for more presses within a 400 millisecond window.
+    return
+
+    KeyControl:
+        BlockInput Off
+        if (control_presses = 1) ; The key was pressed once.
+        {
+            ; ControlSend, , {Ctrl}, A
+        }
+        else if (control_presses = 2) ; The key was pressed twice.
+        {
+            ControlSend, , {Ctrl 3}, A
+ 
+        }
+        else if (control_presses = 3)
+        {
+            ControlSend, , {Ctrl 2}, ahk_exe YoudaoDict.exe
+        }
+        ; tooltip %control_presses%
+        ; SetTimer, RemoveToolTip, 1000
+        control_presses := 0
+    return
+}
+#If
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;常用网址及命令;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;google.com
 ; :*://g::   
@@ -412,6 +456,7 @@ return
     #c::Send,^3
     CapsLock & c::Send,^1
 }
+#If
 
 ; eclipse 复制快捷键
 ; #IfWinActive ahk_class SWT_Window0
@@ -421,10 +466,12 @@ return
 
 ; 粘贴到前一个窗口中, ctrl+alt+c
 ^!c::
-Send,^c
-send,!{Tab}
-sleep,500
-send,^v
+    KeyWait, Ctrl
+    KeyWait, Alt
+    Send,^c
+    send,!{Tab}
+    sleep,500
+    send,^v
 return
 
 ; total commander 快捷键
@@ -570,4 +617,10 @@ ShellRun(prms*)
         }
         ObjRelease(ptlb)
     }
+}
+
+; clear tooltip in 1s
+MyToolTip(text, time:=1000){
+    ToolTip , %text%
+    SetTimer, RemoveToolTip, %time%
 }
