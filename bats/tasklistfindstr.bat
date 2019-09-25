@@ -1,3 +1,3 @@
 @echo off
-tasklist | findstr %1%
+tasklist | findstr /i %1%
 pause
