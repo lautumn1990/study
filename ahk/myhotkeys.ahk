@@ -498,6 +498,67 @@ return
 ; return
 ; #IfWinActive
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;复制链接;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; ctrl+alt+[ (markdown)
+; ctrl+alt+, (html)
+; ctrl+alt+/ (bbcode)
+; 用法, 先复制一个链接, 然后选中文字即可
+^![::linker("markdown")
+^!,::linker("html")
+^!/::linker("bbcode")
+
+linker(link_type) {
+    revert_clipboard := clipboardAll
+    1st_clipboard    := trim(clipboard)
+    clipboard        := ""
+    send ^{c}
+    clipwait, 0.3
+    2nd_clipboard    := trim(clipboard)
+
+    if regExMatch(1st_clipboard, "^(https?://|www\.)[a-zA-Z0-9\-\.]+\.[a-zA-Z]{2,3}(/\S*)?$")
+         link := 1st_clipboard    ; clipboard is url
+    else link := "link"
+
+    if 2nd_clipboard is space     ; (if empty, space, tab or linefeed)
+         text := "text"
+    else text := 2nd_clipboard    ; text was highlighted
+
+    if (link_type = "markdown")
+        clipboard = [%text%](%link%)               ; [text](link)
+    else if (link_type = "html")
+        clipboard = <a href="%link%">%text%</a>    ; <a href="link">text</a>
+    else if (link_type = "bbcode")
+        clipboard = [url=%link%]%text%[/url]       ; [url=link]text[/url]
+    send ^{v}
+
+    if (text = "text")    ; if text wasnt highlighted, add a space at the end
+        send % a_space "{left}"
+
+    if (text = "text")    ; move caret to "link" or "text" and highlight it
+        word := "text"
+    else if (link = "link")
+        word := "link"
+    strReplace(clipboard, word, , count)
+    if (word != "") and (count < 2)
+        {
+        sleep 200
+        stringGetPos, pos, clipboard, % word
+        send % "{left " (strLen(clipboard) - pos) "}+{right " strLen(word) "}"
+        }
+
+    sleep 100
+    clipboard := revert_clipboard
+}
+
+
+/*
+[script info]
+version     = 2.1
+description = generate a html/markdown/bbcode link from the clipboard or selected text
+author      = davebrny
+source      = https://gist.github.com/davebrny/b85e1470d2dd886053ef3415e7198508
+*/
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;窗口操作;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ; 右键加滑轮 实现切换窗口功能
