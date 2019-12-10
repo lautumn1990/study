@@ -455,6 +455,8 @@ return
 {
     #c::Send,^3
     CapsLock & c::Send,^1
+    ; 定位到路径, 取消与clipcube的冲突
+    ^+c::ControlSend, , ^+c, ahk_class TTOTAL_CMD
 }
 #If
 
