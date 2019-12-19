@@ -1,0 +1,77 @@
+
+=============================== HOTKEY HELP ================================
+Win+F1                  <--  ~ Display Help ~
+Ctrl+F                  <-- (Hotkey Help) : Find
+Win+Ctrl+F1             <-- Excluded Files, Hotkeys, and Hotstrings
+Win+Alt+Ctrl+F1         <-- Raw Hotkey List
+Win+Alt+F1              <-- Settings
+
+================================ MYHOTKEYS =================================
+Alt+O                   <--  end(不在total commander 和 idea 中生效 )
+<HS>  ;ta               <-- ;ta 输入markdown中的task前缀
+<HS>  ;to               <-- ;to 输入当前日期20190215 即 today日期
+Ctrl+Alt+/              <-- bbcode 链接快捷键, 先复制一个链接, 然后选中文字即
+Alt+K                   <-- down(不在total commander 和 idea 中生效 )
+<HS>  ;ecif             <-- ecif项目路径
+Win+F1                  <-- first two times
+Alt+U                   <-- home(不在total commander 和 idea 中生效 )
+Ctrl+Alt+,              <-- html 链接快捷键, 先复制一个链接, 然后选中文字即可
+$Ctrl                   <-- idea 中快速三次ctrl为有道翻译
+Ctrl+Alt+M              <-- idea 中禁用ctrl+alt+m, 还是作为方法抽取函数
+Ctrl+Space              <-- idea 中禁用ctrl+space, idea 中的提示功能
+Alt+J                   <-- left(不在total commander 和 idea 中生效 )
+<HS>  ;ki               <-- linux 根据名称杀死进程
+<HS>  ;du               <-- linux命令目录大小
+Ctrl+Alt+[              <-- markdown 链接快捷键, 先复制一个链接, 然后选中文字即可
+<HS>  ;mdmlog           <-- mdm日志路径
+<HS>  ;mdm              <-- mdm项目路径
+Alt+L                   <-- right(不在total commander 和 idea 中生效 )
+<HS>  //cc              <-- send A_AppDataCommon
+<HS>  ;te               <-- test in idea
+<HS>  //rrr             <-- test sleep
+Win+3                   <-- total commander 忽略此全局按键
+Win+2                   <-- total commander 忽略此全局按键
+Win+4                   <-- total commander 忽略此全局按键
+Win+1                   <-- total commander 忽略此全局按键
+Win+5                   <-- total commander 忽略此全局按键
+Alt+I                   <-- up(不在total commander 和 idea 中生效 )
+<HS>  ;tk               <-- windows 根据名称杀死进程
+Alt+H                   <-- 上翻页(不在total commander 和 idea 中生效 )
+Win+Printscreen         <-- 关闭屏幕
+~Lwin & Wheeldown       <-- 减少透明度
+~Rbutton & Wheeldown    <-- 切换窗口功能
+~Rbutton & Wheelup      <-- 切换窗口功能
+Capslock & T            <-- 删除桌面上的ConEmu错误文件
+Capslock & R            <-- 刷新当前autohotkey脚本
+Capslock & X            <-- 剪切当前行
+<HS>  ;co               <-- 加颜色
+Ctrl+Shift+C            <-- 取消与clipcube冲突(total commander中)
+Capslock & W            <-- 取消所有窗口置顶, 防止出现多次置顶问题
+~Lwin & Wheelup         <-- 增加透明度
+Ctrl+Alt+C              <-- 复制到暂存的内容中
+Capslock & D            <-- 复制并删帖行
+Capslock & C            <-- 复制当前行
+Win+C                   <-- 复制文件名
+Win+C                   <-- 复制文件名(total commander中)
+Capslock & C            <-- 复制文件路径
+Capslock & C            <-- 复制文件路径(total commander中)
+Ctrl+Alt+V              <-- 复制暂存的内容
+~Lwin & Mbutton         <-- 恢复透明度
+Win+F                   <-- 打开everything
+<HS>  //ex              <-- 打开explorer
+Win+W                   <-- 打开total commander
+<HS>  //t               <-- 打开任务管理器
+Win+Y                   <-- 打开有道词典
+<HS>  //en              <-- 打开环境变量environment
+<HS>  //sys             <-- 打开系统属性
+<HS>  ;se               <-- 数据库查询
+Alt+F                   <-- 用everything 搜索
+F4                      <-- 用vs code 打开文件
+~Lwin & Rbutton         <-- 窗口置顶
+<HS>  ;ip               <-- 获取当前ip地址
+Ctrl+D                  <-- 记事本中复制一行
+<HS>  ;z@c              <-- 输入公司邮箱
+<HS>  ;im               <-- 输入工单号
+<HS>  ;ii               <-- 输入工单号并模拟登陆操作
+<HS>  ;gr               <-- 过滤进程号
+Alt+A                   <-- 选择一行(不在total commander 和 idea 中生效 )

@@ -1,0 +1,71 @@
+#f:: Line# 18
+#w:: Line# 46
+#y:: Line# 51
+:://cc:: Line# 67
+:://rrr:: Line# 71
+    ^space::ControlSend, , ^{space}, A Line# 86
+    ^!M::ControlSend, , ^!M, A Line# 87
+    $Ctrl:: Line# 95
+:*://ex::    Line# 158
+:*://t::    Line# 163
+:*://en:: Line# 172
+:*://sys:: Line# 185
+!f:: Line# 204
+#PrintScreen:: Line# 211
+^d:: Line# 220
+::;im::IM-20160707-10724 Line# 237
+:*:;ii:: Line# 238
+:*:;du::du -kh --max-depth=1 Line# 247
+:*:;mdmlog::/home/weblogic/bea/user_projects/domains/mdmdomain/logs Line# 249
+:*:;mdm::/home/weblogic/bea/user_projects/domains/mdmdomain Line# 252
+:*:;ecif::/home/middleware/weblogic1213/user_projects/domains/ecifdomain8001 Line# 255
+:*:;ip:: Line# 258
+:*:;z@c::zhangqiu@chinasofti.com Line# 263
+:*:;gr::ps aux | grep --color=auto -i  Line# 266
+:*:;co::--color=auto Line# 269
+:*:;tk::taskkill /F /IM `  Line# 272
+:*:;to:: Line# 275
+:*:;ta:: Line# 283
+:*:;ki:: Line# 289
+:*:;se:: Line# 295
+:*:;te:: Line# 301
+CapsLock & r:: Line# 310
+CapsLock & x:: Line# 316
+CapsLock & c:: Line# 321
+CapsLock & d:: Line# 326
+CapsLock & w:: Line# 332
+CapsLock & t:: Line# 348
+CapsLock & L::ListHotkeys Line# 353
+    !a:: Line# 359
+    !h::Send {PgUp} Line# 366
+    !;::Send {PgDn} Line# 367
+    !u:: Send {Home} Line# 369
+    !o:: Send {End} Line# 370
+    !j:: Send {left} Line# 372
+    !l:: Send {right} Line# 373
+    !i:: Send {up} Line# 374
+    !k:: Send {down} Line# 375
+    ; !f::Send {Backspace} Line# 378
+    ; !d::Send {Delete} Line# 379
+    #c::  Line# 387
+    CapsLock & c:: Line# 399
+    F4:: Line# 416
+    #c::Send,^3 Line# 459
+    CapsLock & c::Send,^1 Line# 460
+    ^+c::ControlSend, , ^+c, ahk_class TTOTAL_CMD Line# 462
+^!c:: Line# 473
+#1::ControlSend, ,#1,ahk_class TTOTAL_CMD Line# 484
+#2::ControlSend, ,#2,ahk_class TTOTAL_CMD Line# 485
+#3::ControlSend, ,#3,ahk_class TTOTAL_CMD Line# 486
+#4::ControlSend, ,#4,ahk_class TTOTAL_CMD Line# 487
+#5::ControlSend, ,#5,ahk_class TTOTAL_CMD Line# 488
+^![::linker("markdown") Line# 511
+^!,::linker("html") Line# 512
+^!/::linker("bbcode") Line# 513
+~RButton & WheelUp:: ShiftAltTab Line# 570
+~RButton & WheelDown:: AltTab Line# 571
+~LWin & RButton:: Line# 573
+~LWin & WheelUp::   Line# 585
+~LWin & WheelDown::  Line# 587
+~LWin & Mbutton::  Line# 589
++!h:: ;<-- Hotkey Help Line# 696

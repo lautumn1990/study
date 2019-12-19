@@ -12,10 +12,16 @@
 ; #Warn  ; Enable warnings to assist with detecting common errors.
 SendMode Input  ; Recommended for new scripts due to its superior speed and reliability.
 SetWorkingDir %A_ScriptDir%  ; Ensures a consistent starting directory.
+#SingleInstance force  ; Ensures that only the last executed instance of script is running
+
+; windows + f1 first time press twice
+#f1:: ;<-- hotkey help, 第一次启动需要加载Hotkey Help.ahk脚本, 所以需要按两次
+    Run, Hotkey Help.ahk
+return
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;全局常用快捷键;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;win+f 打开everything
-#f::
+#f:: ;<-- 打开everything
     DetectHiddenWindows,on
     IfWinNotExist ahk_class EVERYTHING
         run C:\LS\Everything\Everything.exe
@@ -43,12 +49,12 @@ Return
 ; Return
 
 ;win+w 打开total commander
-#w::
+#w:: ;<-- 打开total commander
     windowMaxMinFun("ahk_class TTOTAL_CMD",A_AppData "\..\Local\TotalCMD64\Totalcmd64.exe")
 return
 
 ;win+y 打开有道词典
-#y::
+#y:: ;<-- 打开有道词典
     windowMaxMinFun("ahk_class YodaoMainWndClass",A_AppData "\..\Local\youdao\dict\Application\YodaoDict.exe")
 return
 
@@ -64,11 +70,11 @@ windowMaxMinFun(CL, CLPATH){
     Return
 }
 
-:://cc::
+:://cc:: ;<-- send A_AppDataCommon
     send, %A_AppDataCommon%
 return
 
-:://rrr::
+:://rrr:: ;<-- test sleep
     Reload
     Sleep 1000 ; 如果成功, 则 reload 会在 Sleep 期间关闭这个实例, 所以下面这行语句永远不会执行.
     MsgBox, 4,, The script could not be reloaded. Would you like to open it for editing?
@@ -83,8 +89,12 @@ return
 ; idea 禁用ctrl+space
 #If (WinActive("ahk_exe idea64.exe") or WinActive("ahk_exe Code.exe"))
 {
-    ^space::ControlSend, , ^{space}, A
-    ^!M::ControlSend, , ^!M, A
+    ^space::  ;<-- idea 中禁用ctrl+space, idea 中的提示功能
+        ControlSend, , ^{space}, A
+    return 
+    ^!M:: ;<-- idea 中禁用ctrl+alt+m, 还是作为方法抽取函数
+        ControlSend, , ^!M, A
+    return
 }
 #If
 
@@ -92,7 +102,7 @@ return
 
 #If (WinActive("ahk_exe idea64.exe"))
 {
-    $Ctrl::
+    $Ctrl:: ;<-- idea 中快速三次ctrl为有道翻译
         KeyWait Ctrl
         if (control_presses > 0) ; SetTimer already started, so we log the keypress instead.
         {
@@ -155,12 +165,12 @@ return
 ;     Run cmd.exe
 ; return
 
-:*://ex::   
-Run explorer   
+:*://ex::    ;<-- 打开explorer 
+    Run explorer   
 return  
 
 ;打开任务管理器   
-:*://t::   
+:*://t::   ;<-- 打开任务管理器 
     if WinExist Windows 任务管理器   
         WinActivate   
     else   
@@ -169,7 +179,7 @@ return
 
 ;打开环境变量environment
 ;直接打开
-:*://en::
+:*://en:: ;<-- 打开环境变量environment
     run rundll32.exe sysdm.cpl EditEnvironmentVariables
 return
 ; 模拟按键
@@ -182,7 +192,7 @@ return
 
 
 ;打开系统属性
-:*://sys::
+:*://sys:: ;<-- 打开系统属性
     Run control sysdm.cpl
 return
 
@@ -201,14 +211,14 @@ return
 ; return
 
 ;用everything 搜索
-!f::
+!f:: ;<-- 用everything 搜索
     send ^c
     sleep 100
     run C:\LS\Everything\Everything.exe -s %clipboard%
 return
 
 ;win键 + PrintScreen键关闭屏幕
-#PrintScreen::
+#PrintScreen:: ;<-- 关闭屏幕
     KeyWait PrintScreen
     KeyWait LWin ;释放左Win键才激活下面的命令
     SendMessage,0x112,0xF170,2,,Program Manager ;关闭显示器。0x112:WM_SYSCOMMAND，0xF170:SC_MONITORPOWER。2：关闭，-1：开启显示器
@@ -217,7 +227,7 @@ Return
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;<Notepad>;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 #IfWinActive ahk_class Notepad
 ;ctrl+d复制一行
-^d::
+^d:: ;<-- 记事本中复制一行
     Send {Home}+{End}^c{End}{enter}^v
 return
 ; ;剪切一行
@@ -234,8 +244,10 @@ return
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;常用缩写;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;工单号
-::;im::IM-20160707-10724
-:*:;ii::
+::;im:: ;<-- 输入工单号
+    SendInput,IM-20160707-10724
+return
+:*:;ii:: ;<-- 输入工单号并模拟登陆操作
     SendInput,IM-20160707-10724
     Click, 975, 310
     send,{Space}
@@ -244,35 +256,55 @@ return
 return
 
 ;linux命令目录大小
-:*:;du::du -kh --max-depth=1
+:*:;du:: ;<-- linux命令目录大小
+    SendInput,du -kh --max-depth=1
+return
 ;mdm日志路径
-:*:;mdmlog::/home/weblogic/bea/user_projects/domains/mdmdomain/logs
+:*:;mdmlog:: ;<-- mdm日志路径
+    SendInput,/home/weblogic/bea/user_projects/domains/mdmdomain/logs
+return
 
 ;mdm项目路径
-:*:;mdm::/home/weblogic/bea/user_projects/domains/mdmdomain
+:*:;mdm:: ;<-- mdm项目路径
+    SendInput,/home/weblogic/bea/user_projects/domains/mdmdomain
+return
 
 ;ecif项目路径
-:*:;ecif::/home/middleware/weblogic1213/user_projects/domains/ecifdomain8001
+:*:;ecif:: ;<-- ecif项目路径
+    SendInput,/home/middleware/weblogic1213/user_projects/domains/ecifdomain8001
+return
 
 ;获取当前ip地址
-:*:;ip::
+:*:;ip:: ;<-- 获取当前ip地址
     send,%A_IPAddress1%
 return
 
 ;输入自己的email
-:*:;z@c::zhangqiu@chinasofti.com
+:*:;z@c:: ;<-- 输入公司邮箱
+    SendInput,zhangqiu@chinasofti.com
+return
 
 ;过滤进程号
-:*:;gr::ps aux | grep --color=auto -i 
+:*:;gr:: ;<-- 过滤进程号
+    SendInput,ps aux | grep --color=auto -i 
+return
 
 ;加颜色
-:*:;co::--color=auto
+:*:;co:: ;<-- 加颜色
+    SendInput,--color=auto
+return
 
 ; windows 根据名称杀死进程
-:*:;tk::taskkill /F /IM ` 
+; :*:;tk:: ;<-- windows 根据名称杀死进程
+;     SendInput,taskkill /F /IM ` 
+; return
+
+:*:;tk:: ;<-- windows 根据名称杀死进程
+    SendInput,taskkill /F /IM ` 
+return
 
 ; ;to 输入当前日期20190215 即 today日期
-:*:;to::
+:*:;to:: ;<-- ;to 输入当前日期20190215 即 today日期
     FormatTime, now_date, %A_Now%, yyyyMMdd ;格式化当前时间
     now_date := "{# 3} " . now_date . "` ` {Enter 2}"
     sleep,30
@@ -280,25 +312,25 @@ return
 return
 
 ; ;ta 输入markdown中的task前缀
-:*:;ta::
+:*:;ta:: ;<-- ;ta 输入markdown中的task前缀
     sleep,30
     send, - [ ]` ` 
 return
 
 ; linux 根据名称杀死进程
-:*:;ki::
+:*:;ki:: ;<-- linux 根据名称杀死进程
     send,ps -ef | grep  | grep -v grep | awk `'{{}print $2`{}}`' | xargs kill -9
     send,{left 50}
 return
 
 ;;; 数据库
-:*:;se::
+:*:;se:: ;<-- 数据库查询
 send,select `* from ` `;
 Send {left}
 return
 
 ; test in idea
-:*:;te::
+:*:;te:: ;<-- test in idea
     send,@Test{Enter}public void testname(){{}{Enter}
     send,{up 1}
     send,^{right 2}
@@ -307,29 +339,29 @@ return
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;capslock 全局生效;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; capslock + r刷新当前autohotkey脚本
-CapsLock & r::
+CapsLock & r:: ;<-- 刷新当前autohotkey脚本
     sleep,100
     Reload
 return
 
 ; capslock + x 剪切当前行
-CapsLock & x::
+CapsLock & x:: ;<-- 剪切当前行
     send {home}+{end}^x
 return
 
 ; capslock + c 复制当前行
-CapsLock & c::
+CapsLock & c:: ;<-- 复制当前行
     send {home}+{end}^c
 return
 
 ; capslock + d 复制并删帖行
-CapsLock & d::
+CapsLock & d:: ;<-- 复制并删帖行
     send {home}+{end}^c
     send {end}{enter}^v
 return
 
 ; capslock + w 取消所有窗口置顶, 防止出现多次置顶问题
-CapsLock & w::
+CapsLock & w:: ;<-- 取消所有窗口置顶, 防止出现多次置顶问题
     WinGet, id, List,,, Program Manager
     Loop, %id%
     {
@@ -345,35 +377,35 @@ CapsLock & w::
 return
 
 ; 删除桌面上的ConEmu错误文件
-CapsLock & t::
+CapsLock & t:: ;<-- 删除桌面上的ConEmu错误文件
     FileRemoveDir,%A_Desktop%\ConEmuTrap,1
 return
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;常用键盘映射;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 #If !(WinActive("ahk_class TTOTAL_CMD") or WinActive("ahk_class SunAwtFrame"))
 {
-    ;选择一行
-    !a::
-    Send {Home}
-    Send +{End}
-    Send ^c
+    ; alt+a 选择一行
+    !a:: ;<-- 选择一行,并复制到剪贴板(不在total commander 和 idea 中生效 )
+        Send {Home}
+        Send +{End}
+        Send ^c
     return
 
     ;上页翻页键映射
-    !h::Send {PgUp}
-    !;::Send {PgDn}
+    !h::Send {PgUp} ;<-- 上翻页(不在total commander 和 idea 中生效 )
+    !;::Send {PgDn} ;<-- 下翻页(不在total commander 和 idea 中生效 )
     ;HOME END键映射
-    !u:: Send {Home}
-    !o:: Send {End}
+    !u:: Send {Home} ;<-- home(不在total commander 和 idea 中生效 )
+    !o:: Send {End} ;<--  end(不在total commander 和 idea 中生效 )
     ;Alt + jkli 实现对方向键的映射,写代码的时候灰常有用
-    !j:: Send {left}
-    !l:: Send {right}
-    !i:: Send {up}
-    !k:: Send {down}
+    !j:: Send {left} ;<-- left(不在total commander 和 idea 中生效 )
+    !l:: Send {right} ;<-- right(不在total commander 和 idea 中生效 )
+    !i:: Send {up} ;<-- up(不在total commander 和 idea 中生效 )
+    !k:: Send {down} ;<-- down(不在total commander 和 idea 中生效 )
 
     ; Delete Backspace的映射
-    ; !f::Send {Backspace}
-    ; !d::Send {Delete}
+    ; !f::Send {Backspace} ;<-- backspace(不在total commander 和 idea 中生效 )
+    ; !d::Send {Delete} ;<-- delete(不在total commander 和 idea 中生效 )
     return
 }
 #If
@@ -381,7 +413,7 @@ return
 ;win+c复制全路径 在多窗口生效
 #If WinActive("ahk_class CabinetWClass") or WinActive("ahk_class EVERYTHING") or WinActive("ahk_class WorkerW")
 {
-    #c:: 
+    #c::  ;<-- 复制文件名
         Clipboard = 
         Send,^c 
         ClipWait 
@@ -393,7 +425,7 @@ return
     Return
 
     ; 复制路径名
-    CapsLock & c::
+    CapsLock & c:: ;<-- 复制文件路径
         Clipboard = 
         Send,^c 
         ClipWait
@@ -410,7 +442,7 @@ return
 
 #IF WinActive("ahk_exe explorer.exe")
 {
-    F4::
+    F4::  ;<-- 用vs code 打开文件
         if (winf4_presses > 0) ; SetTimer already started, so we log the keypress instead.
         {
             winf4_presses += 1
@@ -428,7 +460,7 @@ return
         SetTimer, KeyWinF4, -400 ; Wait for more presses within a 400 millisecond window.
     return
 
-    KeyWinF4:
+    KeyWinF4: ;<-- 用vs code 打开文件
         if (winf4_presses = 1) ; The key was pressed once.
         {
             ; Run, m:\  ; Open a folder.
@@ -453,10 +485,10 @@ return
 
 #If WinActive("ahk_class TTOTAL_CMD")
 {
-    #c::Send,^3
-    CapsLock & c::Send,^1
+    #c::Send,^3 ;<-- 复制文件名(total commander中)
+    CapsLock & c::Send,^1 ; <-- 复制文件路径(total commander中)
     ; 定位到路径, 取消与clipcube的冲突
-    ^+c::ControlSend, , ^+c, ahk_class TTOTAL_CMD
+    ^+c::ControlSend, , ^+c, ahk_class TTOTAL_CMD ; <-- 取消与clipcube冲突(total commander中)
 }
 #If
 
@@ -466,23 +498,47 @@ return
 ; ^v::Send,%Clipboard%
 ; #IfWinActive
 
-; 粘贴到前一个窗口中, ctrl+alt+c
-^!c::
-    KeyWait, Ctrl
-    KeyWait, Alt
-    Send,^c
-    send,!{Tab}
-    sleep,500
-    send,^v
+; ; 粘贴到前一个窗口中, ctrl+alt+c
+; ^!c:: ;<-- 粘贴到另一个窗口中, ctrl+alt+c, 临时
+;     KeyWait, Ctrl
+;     KeyWait, Alt
+;     Send,^c
+;     send,!{Tab}
+;     sleep,500
+;     send,^v
+; return
+
+; 自定义暂存区
+myClipboardSaved := ""
+
+^!c:: ;<-- 复制到暂存的内容中
+    ClipSaved := Clipboard
+    Clipboard:=
+    Send,^c 
+    ClipWait 
+    myClipboardSaved := Clipboard 
+    Clipboard := ClipSaved 
+    MyToolTip("以下内容复制到暂存区中 (ctrl+alt+v 粘贴):" 
+    . "`n---------------------------------------------`n" 
+    . myClipboardSaved . "`n---------------------------------------------`n",2000)
+
+return
+
+^!v:: ;<-- 粘贴暂存的内容
+    if(myClipboardSaved = ""){
+        MyToolTip("暂存区现在为空",1000)
+        return
+    }
+    Send,%myClipboardSaved%
 return
 
 ; total commander 快捷键
 #IfWinActive ahk_class TTOTAL_CMD
-#1::ControlSend, ,#1,ahk_class TTOTAL_CMD
-#2::ControlSend, ,#2,ahk_class TTOTAL_CMD
-#3::ControlSend, ,#3,ahk_class TTOTAL_CMD
-#4::ControlSend, ,#4,ahk_class TTOTAL_CMD
-#5::ControlSend, ,#5,ahk_class TTOTAL_CMD
+#1::ControlSend, ,#1,ahk_class TTOTAL_CMD ;<-- total commander 忽略此全局按键
+#2::ControlSend, ,#2,ahk_class TTOTAL_CMD ;<-- total commander 忽略此全局按键
+#3::ControlSend, ,#3,ahk_class TTOTAL_CMD ;<-- total commander 忽略此全局按键
+#4::ControlSend, ,#4,ahk_class TTOTAL_CMD ;<-- total commander 忽略此全局按键
+#5::ControlSend, ,#5,ahk_class TTOTAL_CMD ;<-- total commander 忽略此全局按键
 #IfWinActive
 
 ; word 快速复制, 临时
@@ -505,9 +561,9 @@ return
 ; ctrl+alt+, (html)
 ; ctrl+alt+/ (bbcode)
 ; 用法, 先复制一个链接, 然后选中文字即可
-^![::linker("markdown")
-^!,::linker("html")
-^!/::linker("bbcode")
+^![::linker("markdown") ;<-- markdown 链接快捷键, 先复制一个链接, 然后选中文字即可
+^!,::linker("html") ;<-- html 链接快捷键, 先复制一个链接, 然后选中文字即可
+^!/::linker("bbcode") ;<-- bbcode 链接快捷键, 先复制一个链接, 然后选中文字即 
 
 linker(link_type) {
     revert_clipboard := clipboardAll
@@ -564,10 +620,10 @@ source      = https://gist.github.com/davebrny/b85e1470d2dd886053ef3415e7198508
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;窗口操作;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ; 右键加滑轮 实现切换窗口功能
-~RButton & WheelUp:: ShiftAltTab
-~RButton & WheelDown:: AltTab
+~RButton & WheelUp:: ShiftAltTab  ;<-- 切换窗口功能
+~RButton & WheelDown:: AltTab ;<-- 切换窗口功能
 ; win键+右键 窗口置顶
-~LWin & RButton::
+~LWin & RButton:: ;<-- 窗口置顶
     winset, AlwaysOnTop, Toggle, A
     WinGet, Ex, ExStyle, A
     if (Ex & 0x8)
@@ -579,11 +635,11 @@ return
 
 ;win+滑轮切换透明度
 ; 增加透明度
-~LWin & WheelUp::  
+~LWin & WheelUp::  ;<-- 增加透明度
 ; 减少透明度
-~LWin & WheelDown:: 
+~LWin & WheelDown:: ;<-- 减少透明度
 ; 恢复透明度
-~LWin & Mbutton:: 
+~LWin & Mbutton:: ;<-- 恢复透明度
     WinGet, Trans, Transparent,A  
     If (Trans="")  
         Trans=255  
@@ -610,7 +666,7 @@ return
 return  
 
 ; 清除窗口提示
-RemoveToolTip:
+RemoveToolTip: ;<-- 清除窗口提示
     SetTimer, RemoveToolTip, Off
     ToolTip
 return
