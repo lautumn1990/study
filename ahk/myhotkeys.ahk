@@ -14,6 +14,12 @@ SendMode Input  ; Recommended for new scripts due to its superior speed and reli
 SetWorkingDir %A_ScriptDir%  ; Ensures a consistent starting directory.
 #SingleInstance force  ; Ensures that only the last executed instance of script is running
 
+VSCODE_EXIST := false ; 检测vscode是否存在
+
+if (FileExist(A_APPDATA . "\..\Local\Programs\Microsoft VS Code\Code.exe")){
+    VSCODE_EXIST := true
+}
+
 ; windows + f1 first time press twice
 #f1:: ;<-- hotkey help, 第一次启动需要加载Hotkey Help.ahk脚本, 所以需要按两次
     Run, Hotkey Help.ahk
@@ -96,24 +102,25 @@ return
         ControlSend, , ^!M, A
     return
 }
-#If
 
 ; ; idea 中 三次ctrl为 有道翻译, 两次ctrl为run anything
 
 #If (WinActive("ahk_exe idea64.exe"))
 {
-    $Ctrl:: ;<-- idea 中快速三次ctrl为有道翻译
+    $Ctrl:: ;<-- idea 中快速三次ctrl为有道翻译, 两次ctrl为run anything
         KeyWait Ctrl
         if (control_presses > 0) ; SetTimer already started, so we log the keypress instead.
         {
             ; DllCall("QueryPerformanceCounter", "Int64*", CounterAfter)          ; test click time
             ; MyToolTip((CounterAfter - CounterBefore) / freq * 1000 " ms", 3000)       ; test click time
             SetTimer, KeyControl, Off
-            SetTimer, KeyControl, -200
             control_presses += 1
+            MyToolTip(control_presses)
+            SetTimer, KeyControl, -200
             return
         }
         control_presses := 1
+        MyToolTip(control_presses)
         BlockInput On
         ; DllCall("QueryPerformanceFrequency", "Int64*", freq)                    ; test click time
         ; DllCall("QueryPerformanceCounter", "Int64*", CounterBefore)             ; test click time
@@ -128,8 +135,7 @@ return
         }
         else if (control_presses = 2) ; The key was pressed twice.
         {
-            ControlSend, , {Ctrl 3}, A
- 
+            ControlSend, , {Ctrl 3}, A ; I don't know why need send three times in idea64.exe
         }
         else if (control_presses = 3)
         {
@@ -140,7 +146,6 @@ return
         control_presses := 0
     return
 }
-#If
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;常用网址及命令;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;google.com
@@ -442,45 +447,12 @@ return
 
 #IF WinActive("ahk_exe explorer.exe")
 {
-    F4::  ;<-- 用vs code 打开文件
-        if (winf4_presses > 0) ; SetTimer already started, so we log the keypress instead.
-        {
-            winf4_presses += 1
-            return
-        }
-        ; Otherwise, this is the first press of a new series. Set count to 1 and start
-        ; the timer:
-        ClipSaved := ClipboardAll
-        Clipboard := ""
-        Send ^c
-        ClipWait
-        filename := Clipboard
-        Clipboard := ClipSaved
-        winf4_presses := 1
-        SetTimer, KeyWinF4, -400 ; Wait for more presses within a 400 millisecond window.
-    return
+    F4::OpenWithF4("") ;<-- F4 1次 vscode 命令打开, F4 2次 idea 打开(explorer 中)
+}
 
-    KeyWinF4: ;<-- 用vs code 打开文件
-        if (winf4_presses = 1) ; The key was pressed once.
-        {
-            ; Run, m:\  ; Open a folder.
-            run, "%A_APPDATA%\..\Local\Programs\Microsoft VS Code\Code.exe" "%filename%"
-        }
-        else if (winf4_presses = 2) ; The key was pressed twice.
-        {
-            ; Run, m:\multimedia  ; Open a different folder.
-            run, "id.lnk" "%filename%"
-        }
-        else if (winf4_presses > 2)
-        {
-            ; MsgBox, Three or more clicks detected.
-            MsgBox , "double click f4 3 more times"
-        }
-        ; Regardless of which action above was triggered, reset the count to
-        ; prepare for the next series of presses:
-        winf4_presses := 0
-    return
-
+#If WinActive("ahk_class EVERYTHING")
+{
+    F4::OpenWithF4("ahk_class EVERYTHING") ;<-- F4 1次 everything默认命令打开, F4 2次 idea 打开(everything中)
 }
 
 #If WinActive("ahk_class TTOTAL_CMD")
@@ -489,8 +461,59 @@ return
     CapsLock & c::Send,^1 ; <-- 复制文件路径(total commander中)
     ; 定位到路径, 取消与clipcube的冲突
     ^+c::ControlSend, , ^+c, ahk_class TTOTAL_CMD ; <-- 取消与clipcube冲突(total commander中)
+    F4::OpenWithF4("ahk_class TTOTAL_CMD") ;<-- F4 1次 TC默认命令打开, F4 2次 idea 打开(total commander中)
 }
-#If
+
+; f4启动当前文件, 一次为默认程序打开, 二次为idea打开, 多次需要再定义
+OpenWithF4(CL){ ;cl为要发送的ahk_class名
+    global key_f4_presses
+    global key_f4_filename
+    global key_f4_cl
+     if (key_f4_presses > 0) ; SetTimer already started, so we log the keypress instead.
+        {
+            key_f4_presses += 1
+            return
+        }
+        ; Otherwise, this is the first press of a new series. Set count to 1 and start
+        ; the timer:
+        key_f4_presses := 1 ; 初始化次数
+        key_f4_filename := GetContent() ; 获取到的文件名
+        key_f4_cl := CL ; 要发送f4命令的ahk_class名
+        SetTimer, KeyF4, -400 ; Wait for more presses within a 400 millisecond window.
+    return
+}
+
+KeyF4:
+    ; MyToolTip(key_f4_presses)
+    if (key_f4_presses = 1) ; The key was pressed once.
+    {
+        ; Run, m:\  ; Open a folder.
+        ; run, "%A_APPDATA%\..\Local\Programs\Microsoft VS Code\Code.exe" "%filename%"
+        if (key_f4_cl != ""){ ; 如果不为空, 发送F4命令到指定程序
+            ControlSend, , {F4}, %key_f4_cl%
+        } else if (VSCODE_EXIST){ ; 如果存在vscode则用vscode打开
+            run, "%A_APPDATA%\..\Local\Programs\Microsoft VS Code\Code.exe" "%key_f4_filename%"
+        } else { ; 用notepad打开
+            MyToolTip("没有检测到vscode,用notepad打开")
+            run, "notepad.exe" "%key_f4_filename%"
+        }
+        
+    }
+    else if (key_f4_presses = 2) ; The key was pressed twice.
+    {
+        ; Run, m:\multimedia  ; Open a different folder.
+        run, "id.lnk" "%key_f4_filename%"
+        WinActivate ahk_exe idea64.exe ; idea 默认后台打开
+    }
+    else if (key_f4_presses > 2) ; more times 
+    {
+        ; MsgBox, Three or more clicks detected.
+        MsgBox , "double click f4 3 more times"
+    }
+    ; Regardless of which action above was triggered, reset the count to
+    ; prepare for the next series of presses:
+    key_f4_presses := 0
+return
 
 ; eclipse 复制快捷键
 ; #IfWinActive ahk_class SWT_Window0
@@ -742,4 +765,14 @@ ShellRun(prms*)
 MyToolTip(text, time:=1000){
     ToolTip , %text%
     SetTimer, RemoveToolTip, %time%
+}
+
+GetContent(){
+    ClipSaved := ClipboardAll
+    Clipboard := ""
+    Send ^c
+    ClipWait
+    content := Clipboard
+    Clipboard := ClipSaved
+    return content
 }
