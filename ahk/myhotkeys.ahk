@@ -469,6 +469,7 @@ OpenWithF4(CL){ ;cl为要发送的ahk_class名
     global key_f4_presses
     global key_f4_filename
     global key_f4_cl
+    MyToolTip(key_f4_presses+1)
      if (key_f4_presses > 0) ; SetTimer already started, so we log the keypress instead.
         {
             key_f4_presses += 1
