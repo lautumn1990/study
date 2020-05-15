@@ -384,6 +384,7 @@ return
 ; 删除桌面上的ConEmu错误文件
 CapsLock & t:: ;<-- 删除桌面上的ConEmu错误文件
     FileRemoveDir,%A_Desktop%\ConEmuTrap,1
+    MyToolTip("ConEmuTrap错误文件夹已删除")
 return
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;常用键盘映射;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
