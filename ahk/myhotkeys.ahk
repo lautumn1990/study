@@ -450,11 +450,13 @@ return
 {
     F4::OpenWithF4("") ;<-- F4 1次 vscode 命令打开, F4 2次 idea 打开(explorer 中)
 }
+#If
 
 #If WinActive("ahk_class EVERYTHING")
 {
     F4::OpenWithF4("ahk_class EVERYTHING") ;<-- F4 1次 everything默认命令打开, F4 2次 idea 打开(everything中)
 }
+#If
 
 #If WinActive("ahk_class TTOTAL_CMD")
 {
@@ -464,6 +466,7 @@ return
     ^+c::ControlSend, , ^+c, ahk_class TTOTAL_CMD ; <-- 取消与clipcube冲突(total commander中)
     F4::OpenWithF4("ahk_class TTOTAL_CMD") ;<-- F4 1次 TC默认命令打开, F4 2次 idea 打开(total commander中)
 }
+#If
 
 ; f4启动当前文件, 一次为默认程序打开, 二次为idea打开, 多次需要再定义
 OpenWithF4(CL){ ;cl为要发送的ahk_class名
@@ -555,6 +558,15 @@ return
         return
     }
     Send,%myClipboardSaved%
+return
+
+#+v:: ;<-- 转换
+    temp := Clipboard
+    if InStr(temp,"\")
+		Clipboard := Strreplace(temp,"\","/")
+    Send,^v 
+    MyToolTip("已粘贴linux路径 " 
+    . Clipboard ,2000)
 return
 
 ; total commander 快捷键
