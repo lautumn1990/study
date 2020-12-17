@@ -102,6 +102,7 @@ return
         ControlSend, , ^!M, A
     return
 }
+#If
 
 ; ; idea 中 三次ctrl为 有道翻译, 两次ctrl为run anything
 
@@ -146,6 +147,7 @@ return
         control_presses := 0
     return
 }
+#If
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;常用网址及命令;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;google.com
