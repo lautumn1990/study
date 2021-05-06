@@ -3121,3 +3121,81 @@ find /opt/lampp/htdocs -type d -exec chmod 755 {} \;
 # To change all the files to 644 (-rw-r--r--):
 find /opt/lampp/htdocs -type f -exec chmod 644 {} \;
 ```
+
+### 树莓派
+
+1. 安装系统
+   参考 [树莓派无显示器安装ubuntu](https://roboticsbackend.com/install-ubuntu-on-raspberry-pi-without-monitor/)
+   - 下载工具[balenaEtcher](https://www.balena.io/etcher/)
+   - 下载镜像[Install Ubuntu on a Raspberry Pi](https://ubuntu.com/download/raspberry-pi)
+   - 插入SD卡, 刷入镜像
+   - 打开SD卡根目录, 设置wifi, 编辑`network-config`文件
+
+      ```yml
+      version: 2
+      ethernets:
+        eth0:
+          dhcp4: true
+          optional: true
+      wifis:
+        wlan0:
+          dhcp4: true
+          optional: true
+          access-points:
+            "YOUR_WIFI_NAME":
+              password: "YOUR_WIFI_PASSWORD"
+      ```
+
+      - 注意 空两个空格, wifi名加引号, 密码加引号, 电脑和树莓派链接同样的wifi
+
+   - 编辑 `user-data`文件
+
+      ```yml
+      ...
+      # On first boot, set the (default) ubuntu user's password to "ubuntu" and
+      # expire user passwords
+      chpasswd:
+        expire: true
+        list:
+        - ubuntu:ubuntu
+      # Enable password authentication with the SSH daemon
+      ssh_pwauth: true
+      ...
+      ```
+
+   - 查看ip地址, 通过路由器查看, 名为ubuntu的主机, 树莓派一定要在两分钟后重启一次, 才能看到ip地址
+
+2. 性能测试
+   - 参考[树莓派4装 Kali 64位系统进行性能测试](https://blog.csdn.net/rocshaw/article/details/101035304)
+   - sysbench
+
+    ```bash
+    # 测试
+    sudo apt -y install sysbench
+    # 单线程测试
+    sysbench --test=cpu --cpu-max-prime=2000 run
+    # 多线程测试
+    sysbench --num-threads=4 --test=cpu --cpu-max-prime=20000 run
+    ```
+
+3. 传感器温度
+   - sensors
+
+    ```bash
+    # 安装
+    sudo apt-get install lm-sensors
+    # 查看
+    sensors
+    # 监控
+    watch sensors
+    ```
+
+4. 网速
+   - nload
+
+    ```bash
+    # 安装
+    sudo apt-get install nload 
+    # 查看
+    nload
+    ```
