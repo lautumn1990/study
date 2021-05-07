@@ -3199,3 +3199,23 @@ find /opt/lampp/htdocs -type f -exec chmod 644 {} \;
     # 查看
     nload
     ```
+
+5. 时区调整, 与定时任务
+
+   - timedatectl
+  
+    ```bash
+    # 查看时区
+    sudo timedatectl
+    # 修改时区
+    sudo timedatectl set-timezone 'Asia/Shanghai'
+    ```
+
+   - crontab
+  
+    ```bash
+    # 重启crontab
+    sudo systemctl restart cron.service
+    # 重启rsyslog日志
+    sudo systemctl restart rsyslog.service
+    ```
