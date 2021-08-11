@@ -1947,12 +1947,12 @@ super daemon这种服务通过一个统一的daemon来管理,这个daemon被称�
 
 daemon的启动方式  
 主要目录  
-/etc/init.d/* ：启动脚本放置处  
-/etc/sysconfig/* ：各服务的初始化环境配置文件  
-/etc/xinetd.conf, /etc/xinetd.d/* ：super daemon 配置文件  
-/etc/* ：各服务各自的配置文件  
-/var/lib/* ：各服务产生的数据库  
-/var/run/* ：各服务的程序之 PID 记录处  
+`/etc/init.d/*` ：启动脚本放置处  
+`/etc/sysconfig/*` ：各服务的初始化环境配置文件  
+`/etc/xinetd.conf`, `/etc/xinetd.d/*` ：super daemon 配置文件  
+`/etc/*` ：各服务各自的配置文件  
+`/var/lib/*` ：各服务产生的数据库  
+`/var/run/*` ：各服务的程序之 PID 记录处  
 
 stand alone启动  
 在/etc/init.d/* 启动  一般在次目录下放置服务的启动脚本  
@@ -2133,7 +2133,7 @@ ntsysv为图形管理模式  ntsysv --level 35 为redhat特有
 作用:解决系统错误, 解决网络服务, 过往的记录  
 
 常见的日志  
-/var/log/cron定时任务日志, /var/log/dmesg硬件咨询, /var/log/lastlog最近一次登录, /var/log/maillog 或 /var/log/mail/* 日志, /var/log/messages错误信息, /var/log/secure 输入帐号口令, /var/log/wtmp登录者信息, /var/log/faillog错误登录者信息, /var/log/httpd/*, /var/log/news/*, /var/log/samba/*  
+`/var/log/cron`定时任务日志, `/var/log/dmesg`硬件咨询, `/var/log/lastlog`最近一次登录, `/var/log/maillog` 或 `/var/log/mail/*` 日志, `/var/log/messages`错误信息, `/var/log/secure` 输入帐号口令, `/var/log/wtmp`登录者信息, `/var/log/faillog`错误登录者信息, `/var/log/httpd/*`, `/var/log/news/*`, `/var/log/samba/*`  
 
 主要由syslogd/klogd/logrotate负责记录  
 syslogd：主要登录系统与网络等服务的信息  
