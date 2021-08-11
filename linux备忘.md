@@ -3220,10 +3220,11 @@ find /opt/lampp/htdocs -type f -exec chmod 644 {} \;
     sudo systemctl restart rsyslog.service
     ```
 
-6. centos, ubuntu 替换阿里源
+6. centos, ubuntu, pipy 等替换阿里源
 
 参考  
 
+- [aliyun mirror](https://developer.aliyun.com/mirror)
 - [centos](https://developer.aliyun.com/mirror/centos)
 - [ubuntu](https://developer.aliyun.com/mirror/ubuntu)
 
@@ -3257,5 +3258,9 @@ deb-src http://mirrors.aliyun.com/ubuntu/ focal-proposed main restricted univers
 
 deb http://mirrors.aliyun.com/ubuntu/ focal-backports main restricted universe multiverse
 deb-src http://mirrors.aliyun.com/ubuntu/ focal-backports main restricted universe multiverse
+
+
+# pipy
+pip config set global.index-url https://mirrors.aliyun.com/pypi/simple/
 
 ```
