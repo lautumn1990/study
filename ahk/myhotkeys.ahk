@@ -541,26 +541,26 @@ return
 ; 自定义暂存区
 myClipboardSaved := ""
 
-^!c:: ;<-- 复制到暂存的内容中
-    ClipSaved := Clipboard
-    Clipboard:=
-    Send,^c 
-    ClipWait 
-    myClipboardSaved := Clipboard 
-    Clipboard := ClipSaved 
-    MyToolTip("以下内容复制到暂存区中 (ctrl+alt+v 粘贴):" 
-    . "`n---------------------------------------------`n" 
-    . myClipboardSaved . "`n---------------------------------------------`n",2000)
+; ^!c:: ;<-- 复制到暂存的内容中
+;     ClipSaved := Clipboard
+;     Clipboard:=
+;     Send,^c 
+;     ClipWait 
+;     myClipboardSaved := Clipboard 
+;     Clipboard := ClipSaved 
+;     MyToolTip("以下内容复制到暂存区中 (ctrl+alt+v 粘贴):" 
+;     . "`n---------------------------------------------`n" 
+;     . myClipboardSaved . "`n---------------------------------------------`n",2000)
 
-return
+; return
 
-^!v:: ;<-- 粘贴暂存的内容
-    if(myClipboardSaved = ""){
-        MyToolTip("暂存区现在为空",1000)
-        return
-    }
-    Send,%myClipboardSaved%
-return
+; ^!v:: ;<-- 粘贴暂存的内容
+;     if(myClipboardSaved = ""){
+;         MyToolTip("暂存区现在为空",1000)
+;         return
+;     }
+;     Send,%myClipboardSaved%
+; return
 
 #+v:: ;<-- 转换
     temp := Clipboard
