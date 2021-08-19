@@ -3397,8 +3397,7 @@ find /opt/lampp/htdocs -type f -exec chmod 644 {} \;
 
 7. frpc 设置为系统服务
 
-    下载frp软件, 将`systemd`, 修改配置 `/etc/systemd/system`, 开启
-    `systemctl start frpc.service`, 设置开机启动`sudo systemctl enable frpc.service`  
+    下载frp软件, 将`systemd/frpc.service`, 修改user=root, 或者删掉, 复制到配置 `/usr/lib/systemd/system`, 开启`sudo systemctl start frpc.service`, 设置开机启动`sudo systemctl enable frpc.service`  
 
 8. centos, ubuntu, pipy 等替换阿里源
 
