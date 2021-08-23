@@ -2135,7 +2135,7 @@ ntsysv为图形管理模式  ntsysv --level 35 为redhat特有
 常见的日志  
 `/var/log/cron`定时任务日志, `/var/log/dmesg`硬件咨询, `/var/log/lastlog`最近一次登录, `/var/log/maillog` 或 `/var/log/mail/*` 日志, `/var/log/messages`错误信息, `/var/log/secure` 输入帐号口令, `/var/log/wtmp`登录者信息, `/var/log/faillog`错误登录者信息, `/var/log/httpd/*`, `/var/log/news/*`, `/var/log/samba/*`  
 
-主要由syslogd/klogd/logrotate负责记录  
+主要由`syslogd/klogd/logrotate`负责记录  
 syslogd：主要登录系统与网络等服务的信息  
 klogd：主要登录核心产生的各项资讯  
 logrotate：主要在进行登录文件的轮替功能  
@@ -3279,3 +3279,7 @@ find /opt/lampp/htdocs -type f -exec chmod 644 {} \;
     # 更新
     ./install-frps.sh update
     ```
+1. frpc 设置为系统服务
+
+   下载frp软件, 将`systemd/frpc.service`, 修改user=root, 或者删掉, 复制到配置 `/usr/lib/systemd/system`, 开启`sudo systemctl start frpc.service`, 设置开机启动`sudo systemctl enable frpc.service`  
+
