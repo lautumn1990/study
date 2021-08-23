@@ -3165,7 +3165,7 @@ find /opt/lampp/htdocs -type f -exec chmod 644 {} \;
 
    - 查看ip地址, 通过路由器查看, 名为ubuntu的主机, 树莓派一定要在两分钟后重启一次, 才能看到ip地址
 
-2. 性能测试
+1. 性能测试
    - 参考[树莓派4装 Kali 64位系统进行性能测试](https://blog.csdn.net/rocshaw/article/details/101035304)
    - sysbench
 
@@ -3178,7 +3178,7 @@ find /opt/lampp/htdocs -type f -exec chmod 644 {} \;
     sysbench --num-threads=4 --test=cpu --cpu-max-prime=20000 run
     ```
 
-3. 传感器温度
+1. 传感器温度
    - sensors
 
     ```bash
@@ -3190,7 +3190,7 @@ find /opt/lampp/htdocs -type f -exec chmod 644 {} \;
     watch sensors
     ```
 
-4. 网速
+1. 网速
    - nload
 
     ```bash
@@ -3200,7 +3200,7 @@ find /opt/lampp/htdocs -type f -exec chmod 644 {} \;
     nload
     ```
 
-5. 时区调整, 与定时任务
+1. 时区调整, 与定时任务
 
    - timedatectl
   
@@ -3220,47 +3220,62 @@ find /opt/lampp/htdocs -type f -exec chmod 644 {} \;
     sudo systemctl restart rsyslog.service
     ```
 
-6. centos, ubuntu, pipy 等替换阿里源
+1. centos, ubuntu, pipy 等替换阿里源
 
-参考  
+    参考  
 
-- [aliyun mirror](https://developer.aliyun.com/mirror)
-- [centos](https://developer.aliyun.com/mirror/centos)
-- [ubuntu](https://developer.aliyun.com/mirror/ubuntu)
+    - [aliyun mirror](https://developer.aliyun.com/mirror)
+    - [centos](https://developer.aliyun.com/mirror/centos)
+    - [ubuntu](https://developer.aliyun.com/mirror/ubuntu)
 
-示例
+    示例
 
-```shell
-# centos7
-mv /etc/yum.repos.d/CentOS-Base.repo /etc/yum.repos.d/CentOS-Base.repo.backup
-wget -O /etc/yum.repos.d/CentOS-Base.repo https://mirrors.aliyun.com/repo/Centos-7.repo
-yum makecache
-# 如果出现  Couldn't resolve host 'mirrors.cloud.aliyuncs.com' 
-sed -i -e '/mirrors.cloud.aliyuncs.com/d' -e '/mirrors.aliyuncs.com/d' /etc/yum.repos.d/CentOS-Base.repo
-
-
-
-# ubuntu 20.04
-vim /etc/apt/sources.list
-
-# paste
-deb http://mirrors.aliyun.com/ubuntu/ focal main restricted universe multiverse
-deb-src http://mirrors.aliyun.com/ubuntu/ focal main restricted universe multiverse
-
-deb http://mirrors.aliyun.com/ubuntu/ focal-security main restricted universe multiverse
-deb-src http://mirrors.aliyun.com/ubuntu/ focal-security main restricted universe multiverse
-
-deb http://mirrors.aliyun.com/ubuntu/ focal-updates main restricted universe multiverse
-deb-src http://mirrors.aliyun.com/ubuntu/ focal-updates main restricted universe multiverse
-
-deb http://mirrors.aliyun.com/ubuntu/ focal-proposed main restricted universe multiverse
-deb-src http://mirrors.aliyun.com/ubuntu/ focal-proposed main restricted universe multiverse
-
-deb http://mirrors.aliyun.com/ubuntu/ focal-backports main restricted universe multiverse
-deb-src http://mirrors.aliyun.com/ubuntu/ focal-backports main restricted universe multiverse
+    ```shell
+    # centos7
+    mv /etc/yum.repos.d/CentOS-Base.repo /etc/yum.repos.d/CentOS-Base.repo.backup
+    wget -O /etc/yum.repos.d/CentOS-Base.repo https://mirrors.aliyun.com/repo/Centos-7.repo
+    yum makecache
+    # 如果出现  Couldn't resolve host 'mirrors.cloud.aliyuncs.com' 
+    sed -i -e '/mirrors.cloud.aliyuncs.com/d' -e '/mirrors.aliyuncs.com/d' /etc/yum.repos.d/CentOS-Base.repo
 
 
-# pipy
-pip config set global.index-url https://mirrors.aliyun.com/pypi/simple/
 
-```
+    # ubuntu 20.04
+    vim /etc/apt/sources.list
+
+    # paste
+    deb http://mirrors.aliyun.com/ubuntu/ focal main restricted universe multiverse
+    deb-src http://mirrors.aliyun.com/ubuntu/ focal main restricted universe multiverse
+
+    deb http://mirrors.aliyun.com/ubuntu/ focal-security main restricted universe multiverse
+    deb-src http://mirrors.aliyun.com/ubuntu/ focal-security main restricted universe multiverse
+
+    deb http://mirrors.aliyun.com/ubuntu/ focal-updates main restricted universe multiverse
+    deb-src http://mirrors.aliyun.com/ubuntu/ focal-updates main restricted universe multiverse
+
+    deb http://mirrors.aliyun.com/ubuntu/ focal-proposed main restricted universe multiverse
+    deb-src http://mirrors.aliyun.com/ubuntu/ focal-proposed main restricted universe multiverse
+
+    deb http://mirrors.aliyun.com/ubuntu/ focal-backports main restricted universe multiverse
+    deb-src http://mirrors.aliyun.com/ubuntu/ focal-backports main restricted universe multiverse
+
+
+    # pipy
+    pip config set global.index-url https://mirrors.aliyun.com/pypi/simple/
+
+    ```
+
+1. frps server one key install  
+
+    - 参考文档 [frps-onekey](https://github.com/MvsCode/frps-onekey)
+
+    ```shell
+    # 安装
+    wget https://code.aliyun.com/MvsCode/frps-onekey/raw/master/install-frps.sh -O ./install-frps.sh
+    chmod 700 ./install-frps.sh
+    ./install-frps.sh install
+    # 卸载
+    ./install-frps.sh uninstall
+    # 更新
+    ./install-frps.sh update
+    ```
