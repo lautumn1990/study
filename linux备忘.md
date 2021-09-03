@@ -3283,3 +3283,16 @@ find /opt/lampp/htdocs -type f -exec chmod 644 {} \;
 1. frpc 设置为系统服务
 
    下载frp软件, 将`systemd/frpc.service`, 修改user=root, 或者删掉, 复制到配置 `/usr/lib/systemd/system`, 开启`sudo systemctl start frpc.service`, 设置开机启动`sudo systemctl enable frpc.service`  
+
+1. docker其他用户不能使用
+
+    参考[linux普通用户使用docker](https://blog.csdn.net/u012075238/article/details/103317615)
+
+    ```shell
+    #将当前登录用户加入到docker用户组中
+    sudo gpasswd -a $USER docker
+    #更新用户组
+    newgrp docker
+    #测试docker命令普通用户是否可以正常使用
+    docker ps
+    ```
