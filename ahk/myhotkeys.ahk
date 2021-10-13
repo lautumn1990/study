@@ -562,7 +562,7 @@ myClipboardSaved := ""
 ;     Send,%myClipboardSaved%
 ; return
 
-#+v:: ;<-- ×ª»»
+#+v:: ;<-- ×ª»»linuxÄ¿Â¼
     temp := Clipboard
     if InStr(temp,"\")
 		Clipboard := Strreplace(temp,"\","/")
