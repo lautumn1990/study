@@ -567,8 +567,8 @@ myClipboardSaved := ""
     if InStr(temp,"\")
 		Clipboard := Strreplace(temp,"\","/")
     Send,^v 
-    MyToolTip("已粘贴linux路径 " 
-    . Clipboard ,2000)
+    MyToolTip("已粘贴linux路径 " . Clipboard ,2000)
+    Clipboard := temp
 return
 
 ; total commander 快捷键
