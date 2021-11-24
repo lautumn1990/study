@@ -3457,11 +3457,11 @@ find /opt/lampp/htdocs -type f -exec chmod 644 {} \;
             macvlan:
                 addresses:
                     - 192.168.0.200/24
-                gateway4: 192.168.0.201
+                #gateway4: 192.168.0.201
                 routes:
                     - to: 0.0.0.0/0
-                      via: 192.168.0.201
-                      metric: 40
+                      via: 192.168.0.1
+                      metric: 0
     ```
 
     修改文件权限
