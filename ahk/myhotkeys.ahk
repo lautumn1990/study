@@ -340,8 +340,9 @@ return
 :*:;te:: ;<-- test in idea
     send,@Test{Enter}public void testname(){{}{Enter}
     send,{up 1}
-    send,^{right 2}
-    send,^+{right 1}
+    send,{end 1}
+    send,^{left 3}
+    send,^+{left 1}
 return
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;capslock 全局生效;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -419,7 +420,7 @@ return
 #If
 
 ;win+c复制全路径 在多窗口生效
-#If WinActive("ahk_class CabinetWClass") or WinActive("ahk_class EVERYTHING") or WinActive("ahk_class WorkerW")
+#If WinActive("ahk_class CabinetWClass") or WinActive("ahk_class EVERYTHING") or WinActive("ahk_class WorkerW") or WinActive("ahk_exe Explorer.EXE")
 {
     #c::  ;<-- 复制文件名
         Clipboard = 
