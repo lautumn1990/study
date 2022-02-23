@@ -391,7 +391,7 @@ CapsLock & t:: ;<-- 删除桌面上的ConEmu错误文件
 return
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;常用键盘映射;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-#If !(WinActive("ahk_class TTOTAL_CMD") or WinActive("ahk_class SunAwtFrame"))
+#If !(WinActive("ahk_class TTOTAL_CMD") or WinActive("ahk_class SunAwtFrame") or WinActive("ahk_exe Code.exe"))
 {
     ; alt+a 选择一行
     !a:: ;<-- 选择一行,并复制到剪贴板(不在total commander 和 idea 中生效 )
@@ -401,16 +401,16 @@ return
     return
 
     ;上页翻页键映射
-    !h::Send {PgUp} ;<-- 上翻页(不在total commander 和 idea 中生效 )
+    !p::Send {PgUp} ;<-- 上翻页(不在total commander 和 idea 中生效 )
     !;::Send {PgDn} ;<-- 下翻页(不在total commander 和 idea 中生效 )
     ;HOME END键映射
     !u:: Send {Home} ;<-- home(不在total commander 和 idea 中生效 )
     !o:: Send {End} ;<--  end(不在total commander 和 idea 中生效 )
     ;Alt + jkli 实现对方向键的映射,写代码的时候灰常有用
-    !j:: Send {left} ;<-- left(不在total commander 和 idea 中生效 )
+    !h:: Send {left} ;<-- left(不在total commander 和 idea 中生效 )
     !l:: Send {right} ;<-- right(不在total commander 和 idea 中生效 )
-    !i:: Send {up} ;<-- up(不在total commander 和 idea 中生效 )
-    !k:: Send {down} ;<-- down(不在total commander 和 idea 中生效 )
+    !k:: Send {up} ;<-- up(不在total commander 和 idea 中生效 )
+    !j:: Send {down} ;<-- down(不在total commander 和 idea 中生效 )
 
     ; Delete Backspace的映射
     ; !f::Send {Backspace} ;<-- backspace(不在total commander 和 idea 中生效 )
