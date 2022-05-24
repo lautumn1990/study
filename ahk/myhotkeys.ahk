@@ -673,37 +673,37 @@ source      = https://gist.github.com/davebrny/b85e1470d2dd886053ef3415e7198508
     SetTimer, RemoveToolTip, 1000
 return
 
-;win+滑轮切换透明度
-; 增加透明度
-~LWin & WheelUp::  ;<-- 增加透明度
-; 减少透明度
-~LWin & WheelDown:: ;<-- 减少透明度
-; 恢复透明度
-~LWin & Mbutton:: ;<-- 恢复透明度
-    WinGet, Trans, Transparent,A  
-    If (Trans="")  
-        Trans=255  
-    thiskey := A_ThisHotkey
-    if RegExMatch(thiskey,"WheelUp")>0
-    {
-        Transparent_New:=Trans+20    ;◆透明度增加速度。  
-        If (Transparent_New > 254)  
-            Transparent_New =255  
-    }
-    else if RegExMatch(thiskey,"WheelDown")>0
-    {
-        Transparent_New:=Trans-20  ;◆透明度减少速度。  
-        If (Transparent_New < 150)    ;◆最小透明度限制。  
-            Transparent_New = 150  
-    }
-    else if RegExMatch(thiskey,"Mbutton")>0
-    {
-        Transparent_New = 255 
-    }
-    WinSet,Transparent,%Transparent_New%,A  
-    tooltip %Transparent_New%  ;查看当前透明度（操作之后的）。  
-    SetTimer, RemoveToolTip, 1000
-return  
+; ;win+滑轮切换透明度
+; ; 增加透明度
+; ~LWin & WheelUp::  ;<-- 增加透明度
+; ; 减少透明度
+; ~LWin & WheelDown:: ;<-- 减少透明度
+; ; 恢复透明度
+; ~LWin & Mbutton:: ;<-- 恢复透明度
+;     WinGet, Trans, Transparent,A  
+;     If (Trans="")  
+;         Trans=255  
+;     thiskey := A_ThisHotkey
+;     if RegExMatch(thiskey,"WheelUp")>0
+;     {
+;         Transparent_New:=Trans+20    ;◆透明度增加速度。  
+;         If (Transparent_New > 254)  
+;             Transparent_New =255  
+;     }
+;     else if RegExMatch(thiskey,"WheelDown")>0
+;     {
+;         Transparent_New:=Trans-20  ;◆透明度减少速度。  
+;         If (Transparent_New < 150)    ;◆最小透明度限制。  
+;             Transparent_New = 150  
+;     }
+;     else if RegExMatch(thiskey,"Mbutton")>0
+;     {
+;         Transparent_New = 255 
+;     }
+;     WinSet,Transparent,%Transparent_New%,A  
+;     tooltip %Transparent_New%  ;查看当前透明度（操作之后的）。  
+;     SetTimer, RemoveToolTip, 1000
+; return  
 
 ; 清除窗口提示
 RemoveToolTip: ;<-- 清除窗口提示

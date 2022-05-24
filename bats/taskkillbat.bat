@@ -9,6 +9,6 @@ If Not %ERRORLEVEL% EQU 0 (
         echo not found %1.exe, just found:
         tasklist | findstr /i %1%
     )
-    Pause & Exit
+    Pause
 )
 timeout 2 >nul
