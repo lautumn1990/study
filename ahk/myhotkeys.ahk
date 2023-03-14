@@ -301,6 +301,11 @@ return
     SendInput,--color=auto
 return
 
+;查询ip地址
+:*:;cip:: ;<-- 加颜色
+    SendInput,curl cip.cc/
+return
+
 ; windows 根据名称杀死进程
 ; :*:;tk:: ;<-- windows 根据名称杀死进程
 ;     SendInput,taskkill /F /IM ` 
@@ -457,7 +462,8 @@ return
 
 #If WinActive("ahk_class EVERYTHING")
 {
-    F4::OpenWithF4("ahk_class EVERYTHING") ;<-- F4 1次 everything默认命令打开, F4 2次 idea 打开(everything中)
+    ; F4::OpenWithF4("ahk_class EVERYTHING") ;<-- F4 1次 everything默认命令打开, F4 2次 idea 打开(everything中)
+    F4::OpenWithF4("") ;<-- F4 1次 vscode 命令打开, F4 2次 idea 打开(everything中)
 }
 #If
 
