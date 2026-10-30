@@ -27,7 +27,7 @@ return
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;全局常用快捷键;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;win+f 打开everything
-#f:: ;<-- 打开everything
+$#f:: ;<-- 打开everything
     DetectHiddenWindows,on
     IfWinNotExist ahk_class EVERYTHING
         run C:\LS\Everything\Everything.exe
@@ -55,12 +55,12 @@ Return
 ; Return
 
 ;win+w 打开total commander
-#w:: ;<-- 打开total commander
+$#w:: ;<-- 打开total commander
     windowMaxMinFun("ahk_class TTOTAL_CMD",A_AppData "\..\Local\TotalCMD64\Totalcmd64.exe")
 return
 
 ;win+y 打开有道词典
-#y:: ;<-- 打开有道词典
+$#y:: ;<-- 打开有道词典
     windowMaxMinFun("ahk_class YodaoMainWndClass",A_AppData "\..\Local\youdao\dict\Application\YodaoDict.exe")
 return
 
